@@ -96,7 +96,11 @@
 
       <div class="d-flex gap-2 mt-3 flex-wrap">
         <button type="submit" class="btn btn-sm" style="background:var(--bci-navy);color:#fff;">
-          <i class="bi bi-check-circle me-1"></i>Actualizar cartera
+          <i class="bi bi-check-circle me-1"></i>Guardar y actualizar
+        </button>
+        <button type="button" id="btnAuto" onclick="obtenerOnline()"
+          class="btn btn-sm" style="background:#1a7a3c;color:#fff;">
+          <i class="bi bi-cloud-download me-1"></i>Obtener precios online
         </button>
         <form method="post" action="/reset" style="display:inline;">
           <button type="submit" class="btn btn-sm btn-outline-secondary"
@@ -510,4 +514,39 @@
 
 </div>{# /tab-content #}
 
+<script>
+async function obtenerOnline() {
+  const btn = document.getElementById('btnAuto');
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Obteniendo...';
+
+  try {
+    const r = await fetch('/api/precios_auto');
+    const data = await r.json();
+
+    // Actualiza los inputs del formulario
+    for (const [key, val] of Object.entries(data.precios)) {
+      const inp = document.querySelector(`input[name="${key}"]`);
+      if (inp) inp.value = parseFloat(val).toFixed(4);
+    }
+
+    // Feedback
+    let msg = `Actualizados: ${data.actualizados.join(', ')}`;
+    if (data.manuales && data.manuales.length)
+      msg += `\n\nActualizar manualmente (NAV fondos): ${data.manuales.join(', ')}`;
+    if (data.errores && data.errores.length)
+      msg += `\n\nAdvertencias: ${data.errores.join('; ')}`;
+
+    alert(msg);
+    // Auto-submit para guardar y recalcular
+    document.querySelector('form[action="/precios"]').submit();
+
+  } catch(e) {
+    alert('Error al obtener precios: ' + e.message);
+    btn.disabled = false;
+    btn.innerHTML = orig;
+  }
+}
+</script>
 {% endblock %}

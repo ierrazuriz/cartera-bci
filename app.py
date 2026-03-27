@@ -5,6 +5,7 @@ En Railway: gunicorn app:app
 """
 import os
 import json
+import requests as _requests
 from datetime import date
 from flask import Flask, render_template, request, redirect, url_for, send_file, jsonify
 from cartera_calc import (
@@ -145,6 +146,61 @@ def download_excel():
         )
     except Exception as e:
         return f"Error generando Excel: {e}", 500
+
+
+@app.route("/api/precios_auto")
+def precios_auto():
+    """Obtiene precios actuales via yfinance (Yahoo Finance) + mindicador.cl para UF."""
+    import yfinance as yf
+
+    precios = load_precios()
+    errores = []
+    actualizados = []
+
+    # ── Acciones y FX — yfinance ──────────────────────────────────────────
+    TICKERS_YF = {
+        "ABC":      "ABC.SN",
+        "AGUAS-A":  "AGUAS-A.SN",
+        "CENCOSUD": "CENCOSUD.SN",
+        "CHILE":    "CHILE.SN",
+        "COPEC":    "COPEC.SN",
+        "ENELAM":   "ENELAM.SN",
+        "LTM":      "LTM.SN",
+        "USD":      "USDCLP=X",
+        "EUR":      "EURCLP=X",
+    }
+    try:
+        symbols = list(TICKERS_YF.values())
+        data = yf.download(symbols, period="1d", auto_adjust=True, progress=False)
+        closes = data["Close"].iloc[-1] if not data.empty else {}
+
+        sym_to_nem = {v: k for k, v in TICKERS_YF.items()}
+        for sym, precio in closes.items():
+            nem = sym_to_nem.get(sym)
+            if nem and precio and float(precio) > 0:
+                precios[nem] = round(float(precio), 4)
+                actualizados.append(nem)
+            elif nem:
+                errores.append(f"{nem}: sin precio en Yahoo Finance")
+    except Exception as e:
+        errores.append(f"yfinance: {e}")
+
+    # ── UF — mindicador.cl ────────────────────────────────────────────────
+    try:
+        r = _requests.get("https://mindicador.cl/api/uf", timeout=8)
+        r.raise_for_status()
+        uf_val = r.json()["serie"][0]["valor"]
+        precios["UF"] = round(float(uf_val), 2)
+        actualizados.append("UF")
+    except Exception as e:
+        errores.append(f"UF (mindicador.cl): {e}")
+
+    return jsonify({
+        "precios":      precios,
+        "actualizados": actualizados,
+        "errores":      errores,
+        "manuales":     ["CFIARRAA-E", "CFIMRCLP", "CFITRIPT-E"],
+    })
 
 
 @app.route("/api/estado")
