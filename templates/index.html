@@ -1,0 +1,513 @@
+{% extends "base.html" %}
+{% block content %}
+
+{# ── Resumen patrimonal (cards) ── #}
+<div class="row g-3 mb-3">
+  <div class="col-12 col-md-4">
+    <div class="pat-card">
+      <div class="label">EL LTDA — 76.677.950-6</div>
+      <div class="valor">{{ el.patrimonio_clp|clp }}</div>
+      <div class="sub">
+        UF {{ el.patrimonio_uf|num(0) }} &nbsp;|&nbsp; USD {{ el.patrimonio_usd|num(0) }}
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-4">
+    <div class="pat-card">
+      <div class="label">EMF SPA — 77.209.686-0</div>
+      <div class="valor">{{ emf.patrimonio_clp|clp }}</div>
+      <div class="sub">
+        UF {{ emf.patrimonio_uf|num(0) }} &nbsp;|&nbsp; USD {{ emf.patrimonio_usd|num(0) }}
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-4">
+    <div class="pat-card" style="background:#1a5490;">
+      <div class="label">Total Consolidado</div>
+      <div class="valor">{{ pat_total|clp }}</div>
+      <div class="sub">
+        UF {{ (pat_total / precios.UF)|num(0) }} &nbsp;|&nbsp;
+        USD {{ (pat_total / precios.USD)|num(0) }}
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ── Panel de precios ── #}
+<div class="price-form">
+  <div class="d-flex align-items-center justify-content-between mb-2">
+    <div style="font-weight:700;color:var(--bci-navy);">
+      <i class="bi bi-pencil-square me-1"></i>Actualizar precios de cierre
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-sm btn-outline-secondary" type="button"
+        data-bs-toggle="collapse" data-bs-target="#formPrecios">
+        <i class="bi bi-chevron-down"></i> Mostrar/Ocultar
+      </button>
+    </div>
+  </div>
+
+  <div class="collapse show" id="formPrecios">
+    <form method="post" action="/precios">
+      <div class="row g-2">
+
+        {# Referencias #}
+        <div class="col-12">
+          <div class="price-group-title">Referencias</div>
+        </div>
+        <div class="col-6 col-sm-4 col-md-2">
+          <label>UF ($/UF)</label>
+          <input type="number" step="0.01" name="UF" value="{{ '%.2f'|format(precios.UF) }}">
+        </div>
+        <div class="col-6 col-sm-4 col-md-2">
+          <label>USD/CLP</label>
+          <input type="number" step="0.01" name="USD" value="{{ '%.2f'|format(precios.USD) }}">
+        </div>
+        <div class="col-6 col-sm-4 col-md-2">
+          <label>EUR/CLP</label>
+          <input type="number" step="0.01" name="EUR" value="{{ '%.2f'|format(precios.EUR) }}">
+        </div>
+
+        {# Acciones #}
+        <div class="col-12">
+          <div class="price-group-title">Acciones</div>
+        </div>
+        {% for nem in ["ABC","AGUAS-A","CENCOSUD","CHILE","COPEC","ENELAM","LTM"] %}
+        <div class="col-6 col-sm-4 col-md-2">
+          <label>{{ nem }}</label>
+          <input type="number" step="0.0001" name="{{ nem }}"
+            value="{{ '%.4f'|format(precios[nem]) }}">
+        </div>
+        {% endfor %}
+
+        {# CFI #}
+        <div class="col-12">
+          <div class="price-group-title">CFI (NAV)</div>
+        </div>
+        {% for nem in ["CFIARRAA-E","CFIMRCLP","CFITRIPT-E"] %}
+        <div class="col-6 col-sm-4 col-md-2">
+          <label>{{ nem }}</label>
+          <input type="number" step="0.0001" name="{{ nem }}"
+            value="{{ '%.4f'|format(precios[nem]) }}">
+        </div>
+        {% endfor %}
+
+      </div>{# /row #}
+
+      <div class="d-flex gap-2 mt-3 flex-wrap">
+        <button type="submit" class="btn btn-sm" style="background:var(--bci-navy);color:#fff;">
+          <i class="bi bi-check-circle me-1"></i>Actualizar cartera
+        </button>
+        <form method="post" action="/reset" style="display:inline;">
+          <button type="submit" class="btn btn-sm btn-outline-secondary"
+            onclick="return confirm('¿Restablecer precios a valores cartola 27/03/2026?')">
+            <i class="bi bi-arrow-counterclockwise me-1"></i>Restablecer base
+          </button>
+        </form>
+        <a href="/excel" class="btn btn-sm btn-outline-success">
+          <i class="bi bi-file-earmark-excel me-1"></i>Descargar Excel
+        </a>
+        <a href="/api/estado" target="_blank" class="btn btn-sm btn-outline-secondary">
+          <i class="bi bi-braces me-1"></i>JSON
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+{# ── Tabs empresas ── #}
+<ul class="nav nav-tabs" id="tabEmpresas">
+  <li class="nav-item">
+    <a class="nav-link active" data-bs-toggle="tab" href="#tabEL">
+      EL LTDA <span class="ms-1 badge" style="background:var(--bci-blue);">76.677.950-6</span>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-bs-toggle="tab" href="#tabEMF">
+      EMF SPA <span class="ms-1 badge" style="background:var(--bci-blue);">77.209.686-0</span>
+    </a>
+  </li>
+</ul>
+
+<div class="tab-content">
+
+{# ════════════════════════════════════════════════════════ EL LTDA ══ #}
+<div class="tab-pane fade show active" id="tabEL">
+
+  {# Resumen patrimonial EL #}
+  <div class="card-section">
+    <div class="section-title">Resumen Patrimonial — EL LTDA.</div>
+    <table class="tbl-cartera">
+      <thead>
+        <tr>
+          <th>Componente</th>
+          <th class="num">Monto CLP</th>
+          <th class="num">UF</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Caja Disponible (cartola 27/03)</td>
+          <td class="num">{{ el.caja|miles }}</td>
+          <td class="num">{{ (el.caja / precios.UF)|num(1) }}</td>
+        </tr>
+        <tr>
+          <td style="padding-left:22px;font-size:.82rem;color:#777;">Operaciones por liquidar</td>
+          <td class="num" style="font-size:.82rem;color:#777;">{{ el.ops_liquidar|miles }}</td>
+          <td class="num" style="font-size:.82rem;color:#777;">{{ (el.ops_liquidar / precios.UF)|num(1) }}</td>
+        </tr>
+        <tr>
+          <td>Acciones — Valor Neto (activo − pasivo)</td>
+          <td class="num">{{ el.tot_acc_neto|miles }}</td>
+          <td class="num">{{ (el.tot_acc_neto / precios.UF)|num(1) }}</td>
+        </tr>
+        <tr>
+          <td>CFI — Valor Mercado</td>
+          <td class="num">{{ el.tot_cfi|miles }}</td>
+          <td class="num">{{ (el.tot_cfi / precios.UF)|num(1) }}</td>
+        </tr>
+        <tr>
+          <td>Simultáneas — Monto comprometido (pasivo)</td>
+          <td class="num neg">− {{ el.tot_sim_amort|miles }}</td>
+          <td class="num neg">− {{ (el.tot_sim_amort / precios.UF)|num(1) }}</td>
+        </tr>
+        <tr class="tr-total">
+          <td>PATRIMONIO TOTAL (CLP)</td>
+          <td class="num">{{ el.patrimonio_clp|miles }}</td>
+          <td class="num">{{ el.patrimonio_uf|num(0) }} UF</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  {# Acciones #}
+  <div class="card-section">
+    <div class="section-title">Detalle Acciones</div>
+    <table class="tbl-cartera">
+      <thead>
+        <tr>
+          <th>Nemotécnico</th>
+          <th>Nombre</th>
+          <th class="num">Cant. Activo</th>
+          <th class="num">Cant. Pasivo</th>
+          <th class="num">Precio Cartola</th>
+          <th class="num">Precio Hoy</th>
+          <th class="num">Var. %</th>
+          <th class="num">Valor Activo</th>
+          <th class="num">Valor Pasivo</th>
+          <th class="num">Valor Neto</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in el.acciones %}
+        <tr>
+          <td><span class="nem">{{ a.nem }}</span></td>
+          <td style="font-size:.82rem;">{{ a.nombre }}</td>
+          <td class="num">{{ a.cant_activo|miles }}</td>
+          <td class="num">{% if a.cant_pasivo != 0 %}{{ a.cant_pasivo|miles }}{% else %}—{% endif %}</td>
+          <td class="num">{{ a.precio_cartola|num(4) }}</td>
+          <td class="num" style="font-weight:700;">{{ a.precio_hoy|num(4) }}</td>
+          <td class="num {{ a.var_pct|signo }}">{{ a.var_pct|pct }}</td>
+          <td class="num">{{ a.valor_activo|miles }}</td>
+          <td class="num">{% if a.cant_pasivo != 0 %}{{ a.valor_pasivo|miles }}{% else %}—{% endif %}</td>
+          <td class="num" style="font-weight:700;">{{ a.valor_neto|miles }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr class="tr-total">
+          <td colspan="7">TOTAL ACCIONES</td>
+          <td class="num">{{ el.tot_acc_activo|miles }}</td>
+          <td class="num">{{ el.tot_acc_pasivo|miles }}</td>
+          <td class="num">{{ el.tot_acc_neto|miles }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  {# CFI #}
+  <div class="card-section">
+    <div class="section-title">Detalle CFI</div>
+    <table class="tbl-cartera">
+      <thead>
+        <tr>
+          <th>Nemotécnico</th>
+          <th>Nombre</th>
+          <th class="num">Cantidad</th>
+          <th class="num">Precio Compra</th>
+          <th class="num">Precio Cartola</th>
+          <th class="num">Precio Hoy (NAV)</th>
+          <th class="num">Var. %</th>
+          <th class="num">Valor Mercado CLP</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in el.cfis %}
+        <tr>
+          <td><span class="nem">{{ c.nem }}</span></td>
+          <td style="font-size:.82rem;">{{ c.nombre }}</td>
+          <td class="num">{{ c.cantidad|miles }}</td>
+          <td class="num">{{ c.precio_compra|num(4) }}</td>
+          <td class="num">{{ c.precio_cartola|num(4) }}</td>
+          <td class="num" style="font-weight:700;">{{ c.precio_hoy|num(4) }}</td>
+          <td class="num {{ c.var_pct|signo }}">{{ c.var_pct|pct }}</td>
+          <td class="num" style="font-weight:700;">{{ c.valor_mercado|miles }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr class="tr-total">
+          <td colspan="7">TOTAL CFI</td>
+          <td class="num">{{ el.tot_cfi|miles }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  {# Simultáneas #}
+  <div class="card-section">
+    <div class="section-title">Simultáneas — Compras a Plazo</div>
+    <table class="tbl-cartera">
+      <thead>
+        <tr>
+          <th>Instrumento</th>
+          <th class="num">Cantidad</th>
+          <th class="cen">F. Venta</th>
+          <th class="num">Monto Venta</th>
+          <th class="cen">F. Compra Plazo</th>
+          <th class="num">Monto Compra</th>
+          <th class="num">Monto Amortizado Hoy</th>
+          <th class="num">Val. Mercado Hoy</th>
+          <th class="num">Resultado MtM</th>
+          <th class="cen">Días Rest.</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in el.sims %}
+        <tr {% if s.vencida %}style="opacity:.6;"{% endif %}>
+          <td>
+            <span class="nem">{{ s.instrumento }}</span>
+            {% if s.vencida %}<span class="vencida-badge ms-1">VENCIDA</span>{% endif %}
+          </td>
+          <td class="num">{{ s.cantidad|miles }}</td>
+          <td class="cen">{{ s.f_venta|fdate }}</td>
+          <td class="num">{{ s.monto_venta|miles }}</td>
+          <td class="cen">{{ s.f_compra|fdate }}</td>
+          <td class="num">{{ s.monto_compra|miles }}</td>
+          <td class="num" style="font-weight:700;">{{ s.monto_amortizado|miles }}</td>
+          <td class="num">{{ s.valor_mercado|miles }}</td>
+          <td class="num {{ s.resultado|signo }}">{{ s.resultado|miles }}</td>
+          <td class="cen">
+            {% if s.vencida %}
+              <span class="vencida-badge">—</span>
+            {% else %}
+              <span class="ok-badge">{{ s.dias_restantes }}d</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr class="tr-total">
+          <td colspan="6">TOTAL SIMULTÁNEAS</td>
+          <td class="num">{{ el.tot_sim_amort|miles }}</td>
+          <td class="num">{{ el.tot_sim_vm|miles }}</td>
+          <td class="num {{ el.tot_sim_resultado|signo }}">{{ el.tot_sim_resultado|miles }}</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+    <div class="nota px-3 py-2">
+      El monto amortizado se registra como pasivo en el patrimonio (repos comprometidos).
+      Resultado MtM = valor mercado acciones en garantía − monto amortizado.
+    </div>
+  </div>
+
+</div>{# /tabEL #}
+
+
+{# ════════════════════════════════════════════════════════ EMF SPA ══ #}
+<div class="tab-pane fade" id="tabEMF">
+
+  {# Resumen patrimonial EMF #}
+  <div class="card-section">
+    <div class="section-title">Resumen Patrimonial — EMF SPA</div>
+    <table class="tbl-cartera">
+      <thead>
+        <tr>
+          <th>Componente</th>
+          <th class="num">Monto CLP</th>
+          <th class="num">UF</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Caja Disponible (cartola 27/03)</td>
+          <td class="num">{{ emf.caja|miles }}</td>
+          <td class="num">{{ (emf.caja / precios.UF)|num(1) }}</td>
+        </tr>
+        <tr>
+          <td>CFI — Valor Mercado</td>
+          <td class="num">{{ emf.tot_cfi|miles }}</td>
+          <td class="num">{{ (emf.tot_cfi / precios.UF)|num(1) }}</td>
+        </tr>
+        <tr>
+          <td>Forwards USD/CLP — Resultado MtM <span style="font-size:.75rem;color:#888;">(no incluido en patrimonio)</span></td>
+          <td class="num {{ emf.tot_fwd|signo }}" style="font-size:.82rem;">{{ emf.tot_fwd|miles }}</td>
+          <td class="num {{ emf.tot_fwd|signo }}" style="font-size:.82rem;">{{ (emf.tot_fwd / precios.UF)|num(1) }}</td>
+        </tr>
+        <tr class="tr-total">
+          <td>PATRIMONIO TOTAL (CLP)</td>
+          <td class="num">{{ emf.patrimonio_clp|miles }}</td>
+          <td class="num">{{ emf.patrimonio_uf|num(0) }} UF</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  {# CFI EMF #}
+  <div class="card-section">
+    <div class="section-title">Detalle CFI</div>
+    <table class="tbl-cartera">
+      <thead>
+        <tr>
+          <th>Nemotécnico</th>
+          <th>Nombre</th>
+          <th class="num">Cantidad</th>
+          <th class="num">Precio Compra</th>
+          <th class="num">Precio Cartola</th>
+          <th class="num">Precio Hoy (NAV)</th>
+          <th class="num">Var. %</th>
+          <th class="num">Valor Mercado CLP</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in emf.cfis %}
+        <tr>
+          <td><span class="nem">{{ c.nem }}</span></td>
+          <td style="font-size:.82rem;">{{ c.nombre }}</td>
+          <td class="num">{{ c.cantidad|miles }}</td>
+          <td class="num">{{ c.precio_compra|num(4) }}</td>
+          <td class="num">{{ c.precio_cartola|num(4) }}</td>
+          <td class="num" style="font-weight:700;">{{ c.precio_hoy|num(4) }}</td>
+          <td class="num {{ c.var_pct|signo }}">{{ c.var_pct|pct }}</td>
+          <td class="num" style="font-weight:700;">{{ c.valor_mercado|miles }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr class="tr-total">
+          <td colspan="7">TOTAL CFI</td>
+          <td class="num">{{ emf.tot_cfi|miles }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  {# Forwards #}
+  <div class="card-section">
+    <div class="section-title">Forwards USD/CLP — Seguros de Cambio</div>
+    <table class="tbl-cartera">
+      <thead>
+        <tr>
+          <th>Folio</th>
+          <th class="cen">Tipo</th>
+          <th class="num">USD Nominal</th>
+          <th class="num">TC Forward</th>
+          <th class="cen">F. Inicio</th>
+          <th class="cen">F. Término</th>
+          <th class="num">TC Spot Hoy</th>
+          <th class="num">Resultado CLP</th>
+          <th class="cen">Días Rest.</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in emf.fwds %}
+        <tr {% if f.vencido %}style="opacity:.6;"{% endif %}>
+          <td class="cen" style="font-size:.8rem;">{{ f.folio }}</td>
+          <td class="cen">
+            {% if f.tipo == "C" %}
+              <span class="ok-badge" style="background:#e8f5e9;color:#1a7a3c;">COMPRA</span>
+            {% else %}
+              <span class="ok-badge" style="background:#fff3e0;color:#e65100;">VENTA</span>
+            {% endif %}
+          </td>
+          <td class="num">{{ f.usd|miles }}</td>
+          <td class="num">{{ f.tc_fwd|num(2) }}</td>
+          <td class="cen">{{ f.f_inicio|fdate }}</td>
+          <td class="cen">{{ f.f_termino|fdate }}</td>
+          <td class="num">{{ f.tc_spot|num(2) }}</td>
+          <td class="num {{ f.resultado|signo }}" style="font-weight:700;">{{ f.resultado|miles }}</td>
+          <td class="cen">
+            {% if f.vencido %}
+              <span class="vencida-badge">VCTO</span>
+            {% else %}
+              <span class="ok-badge">{{ f.dias_restantes }}d</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr class="tr-total">
+          <td colspan="7">TOTAL FORWARDS</td>
+          <td class="num {{ emf.tot_fwd|signo }}">{{ emf.tot_fwd|miles }}</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+    <div class="nota px-3 py-2">
+      Compra: resultado = (Spot − TC Fwd) × USD &nbsp;|&nbsp;
+      Venta: resultado = (TC Fwd − Spot) × USD &nbsp;|&nbsp;
+      Descalce neto: Compra {{ emf.compra_usd|miles }} USD / Venta {{ emf.venta_usd|miles }} USD /
+      Neto {{ emf.descalce_usd|miles }} USD
+    </div>
+  </div>
+
+  {# Historial caja EMF #}
+  <div class="card-section">
+    <div class="section-title">Historial Movimientos Caja — Compensaciones Forward (marzo 2026)</div>
+    <table class="tbl-cartera">
+      <thead>
+        <tr>
+          <th class="cen">Fecha</th>
+          <th class="cen">Referencia</th>
+          <th>Operación</th>
+          <th class="num">Cargo CLP</th>
+          <th class="num">Abono CLP</th>
+          <th class="num">Saldo CLP</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% set movs = [
+          ("01/03/2026","","Saldo inicial del período",0,7761120,7761120),
+          ("12/03/2026","1830442","Cargo comp. FWD",9045000,0,-1283880),
+          ("12/03/2026","1830441","Cargo comp. FWD",8970000,0,-10253880),
+          ("12/03/2026","1830440","Abono vcto. FWD comp.",0,9995000,-258880),
+          ("12/03/2026","1830439","Abono vcto. FWD comp.",0,11495000,11236120),
+          ("13/03/2026","1830514","Abono vcto. FWD comp.",0,6920000,18156120),
+          ("13/03/2026","1829896","Cargo comp. FWD",1265000,0,16891120),
+          ("19/03/2026","1831499","Abono vcto. FWD comp.",0,2305000,19196120),
+          ("19/03/2026","1831351","Cargo comp. FWD",865000,0,18331120),
+          ("19/03/2026","1831076","Cargo comp. FWD",1505000,0,16826120),
+          ("31/03/2026","","Saldo final del período",0,0,16826120)
+        ] %}
+        {% for fecha,ref,oper,cargo,abono,saldo in movs %}
+        <tr {% if loop.first or loop.last %}style="font-weight:700;background:#f2f2f2;"{% endif %}>
+          <td class="cen" style="font-size:.82rem;">{{ fecha }}</td>
+          <td class="cen" style="font-size:.8rem;color:#888;">{{ ref }}</td>
+          <td>{{ oper }}</td>
+          <td class="num neg">{% if cargo > 0 %}{{ cargo|miles }}{% endif %}</td>
+          <td class="num pos">{% if abono > 0 %}{{ abono|miles }}{% endif %}</td>
+          <td class="num" style="font-weight:700;">{{ saldo|miles }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>{# /tabEMF #}
+
+</div>{# /tab-content #}
+
+{% endblock %}
