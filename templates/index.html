@@ -72,7 +72,7 @@
         <div class="col-12">
           <div class="price-group-title">Acciones</div>
         </div>
-        {% for nem in ["ABC","AGUAS-A","CENCOSUD","CHILE","COPEC","ENELAM","LTM"] %}
+                {% for nem in ["ABC","AGUAS-A","CENCOSUD","CHILE","COPEC","ENELAM","ITAUCL","LTM"] %}
         <div class="col-6 col-sm-4 col-md-2">
           <label>{{ nem }}</label>
           <input type="number" step="0.0001" name="{{ nem }}"
@@ -84,7 +84,7 @@
         <div class="col-12">
           <div class="price-group-title">CFI (NAV)</div>
         </div>
-        {% for nem in ["CFIARRAA-E","CFIMRCLP","CFITRIPT-E"] %}
+                {% for nem in ["CFIARRAA-E"] %}
         <div class="col-6 col-sm-4 col-md-2">
           <label>{{ nem }}</label>
           <input type="number" step="0.0001" name="{{ nem }}"
@@ -104,7 +104,7 @@
         </button>
         <form method="post" action="/reset" style="display:inline;">
           <button type="submit" class="btn btn-sm btn-outline-secondary"
-            onclick="return confirm('¿Restablecer precios a valores cartola 27/03/2026?')">
+                        onclick="return confirm('¿Restablecer precios a valores cartola 01/04/2026?')"
             <i class="bi bi-arrow-counterclockwise me-1"></i>Restablecer base
           </button>
         </form>
@@ -151,7 +151,7 @@
       </thead>
       <tbody>
         <tr>
-          <td>Caja Disponible (cartola 27/03)</td>
+                        <td>Caja Disponible (cartola 01/04)</td>td>
           <td class="num">{{ el.caja|miles }}</td>
           <td class="num">{{ (el.caja / precios.UF)|num(1) }}</td>
         </tr>
@@ -346,7 +346,7 @@
       </thead>
       <tbody>
         <tr>
-          <td>Caja Disponible (cartola 27/03)</td>
+                        <td>Caja Disponible (cartola 01/04)</td>td>
           <td class="num">{{ emf.caja|miles }}</td>
           <td class="num">{{ (emf.caja / precios.UF)|num(1) }}</td>
         </tr>
