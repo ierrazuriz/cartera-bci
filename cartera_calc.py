@@ -133,8 +133,8 @@ def calcular_el(precios, hoy=None):
         tot_cfi       = sum(c["valor_mercado"] for c in cfis)
         tot_sim_amort = sum(s["monto_amortizado"] for s in sims)
 
-    patrimonio = CAJA_EL + OPS_LIQUIDAR + tot_acc_neto + tot_cfi - tot_sim_amort
-    return {
+        patrimonio = CAJA_EL + OPS_LIQUIDAR + tot_acc_neto + tot_cfi - tot_sim_amort
+            return {
                 "acciones": acciones, "cfis": cfis, "sims": sims,
                 "tot_acc_activo":  sum(a["valor_activo"]  for a in acciones),
                 "tot_acc_pasivo":  sum(a["valor_pasivo"]  for a in acciones),
