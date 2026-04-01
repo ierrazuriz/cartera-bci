@@ -166,6 +166,7 @@ def precios_auto():
         "COPEC":    "COPEC.SN",
         "ENELAM":   "ENELAM.SN",
         "LTM":      "LTM.SN",
+            "ITAUCL":   "ITAUCL.SN",
         "USD":      "USDCLP=X",
         "EUR":      "EURCLP=X",
     }
@@ -199,7 +200,7 @@ def precios_auto():
         "precios":      precios,
         "actualizados": actualizados,
         "errores":      errores,
-        "manuales":     ["CFIARRAA-E", "CFIMRCLP", "CFITRIPT-E"],
+                    "manuales":    ["CFIARRAA-E"],
     })
 
 
