@@ -134,7 +134,7 @@ def calcular_el(precios, hoy=None):
         tot_sim_amort = sum(s["monto_amortizado"] for s in sims)
 
         patrimonio = CAJA_EL + OPS_LIQUIDAR + tot_acc_neto + tot_cfi - tot_sim_amort
-        rn {
+        return {
                 "acciones": acciones, "cfis": cfis, "sims": sims,
                 "tot_acc_activo":  sum(a["valor_activo"]  for a in acciones),
                 "tot_acc_pasivo":  sum(a["valor_pasivo"]  for a in acciones),
@@ -169,11 +169,11 @@ def calcular_emf(precios, hoy=None):
         fwds = []
         compra_usd = venta_usd = 0
         for folio, tipo, usd, tc_fwd, f_ini, f_term in EMF_FWD:
-                    resultado = (spot - tc_fwd) * usd if tipo == "C" else (tc_fwd - spot) * usd
-                    if tipo == "C":
-                                    compra_usd += usd
-else:
-            venta_usd += usd
+            resultado = (spot - tc_fwd) * usd if tipo == "C" else (tc_fwd - spot) * usd
+            if tipo == "C":
+                compra_usd += usd
+            else:
+                venta_usd += usd
             fwds.append({
                 "folio": folio, "tipo": tipo, "usd": usd,
                 "tc_fwd": tc_fwd, "f_inicio": f_ini, "f_termino": f_term,
@@ -182,17 +182,17 @@ else:
                 "vencido": hoy >= f_term,
             })
 
-    tot_cfi = sum(c["valor_mercado"] for c in cfis)
-    tot_fwd = sum(f["resultado"]     for f in fwds)
+        tot_cfi = sum(c["valor_mercado"] for c in cfis)
+        tot_fwd = sum(f["resultado"]     for f in fwds)
 
-    patrimonio = CAJA_EMF + tot_cfi
-    return {
-                "cfis": cfis, "fwds": fwds,
-                "tot_cfi": tot_cfi, "tot_fwd": tot_fwd,
-                "compra_usd": compra_usd, "venta_usd": venta_usd,
-                "descalce_usd": compra_usd - venta_usd,
-                "caja": CAJA_EMF,
-                "patrimonio_clp":  patrimonio,
-                "patrimonio_uf":   patrimonio / precios.get("UF",  39_841.72),
-                "patrimonio_usd":  patrimonio / precios.get("USD",    927.46),
-    }
+        patrimonio = CAJA_EMF + tot_cfi
+        return {
+            "cfis": cfis, "fwds": fwds,
+            "tot_cfi": tot_cfi, "tot_fwd": tot_fwd,
+            "compra_usd": compra_usd, "venta_usd": venta_usd,
+            "descalce_usd": compra_usd - venta_usd,
+            "caja": CAJA_EMF,
+            "patrimonio_clp":  patrimonio,
+            "patrimonio_uf":   patrimonio / precios.get("UF",  39_841.72),
+            "patrimonio_usd":  patrimonio / precios.get("USD",    927.46),
+        }
