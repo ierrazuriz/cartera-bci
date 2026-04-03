@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <div>
+    <a href="{{ url_for('index') }}" class="btn btn-sm btn-outline-secondary me-2">
+      <i class="bi bi-arrow-left"></i> Cartera
+    </a>
+    <strong>Movimientos & Facturas BCI</strong>
+  </div>
+  {% if data.sync_at %}
+  <span class="badge" style="background:var(--bci-blue)">
+    <i class="bi bi-clock me-1"></i>Sync: {{ data.sync_at[:16].replace('T',' ') }}
+  </span>
+  {% endif %}
+</div>
+
+{# ── Resumen rápido ── #}
+<div class="row g-2 mb-3">
+  <div class="col-6 col-md-3">
+    <div class="pat-card text-center" style="padding:12px">
+      <div class="label">Transacciones</div>
+      <div class="valor" style="font-size:1.4rem">{{ data.movimientos|length }}</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="pat-card text-center" style="padding:12px">
+      <div class="label">Dividendos</div>
+      <div class="valor" style="font-size:1.4rem">{{ data.dividendos|length }}</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="pat-card text-center" style="padding:12px">
+      <div class="label">Forwards</div>
+      <div class="valor" style="font-size:1.4rem">{{ data.forwards|length }}</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    {% set disc = data.comparacion|selectattr('Diferencia','ne','0')|list %}
+    <div class="pat-card text-center" style="padding:12px; {% if disc %}background:#7b1a1a{% endif %}">
+      <div class="label">Discrepancias</div>
+      <div class="valor" style="font-size:1.4rem">{{ disc|length }}</div>
+    </div>
+  </div>
+</div>
+
+{# ── Tabs ── #}
+<ul class="nav nav-tabs" id="factTabs">
+  <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tab-mov">
+    <i class="bi bi-arrow-left-right me-1"></i>Movimientos</a></li>
+  <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-div">
+    <i class="bi bi-cash-coin me-1"></i>Dividendos</a></li>
+  <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-fwd">
+    <i class="bi bi-currency-exchange me-1"></i>Forwards</a></li>
+  <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-trans">
+    <i class="bi bi-bank me-1"></i>Transferencias</a></li>
+  <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-comp">
+    <i class="bi bi-check2-circle me-1"></i>Comparación</a></li>
+</ul>
+
+<div class="tab-content card-section" style="border-radius:0 0 6px 6px; overflow:auto">
+
+  {# ── Movimientos ── #}
+  <div class="tab-pane fade show active p-0" id="tab-mov">
+    <table class="tbl-cartera">
+      <thead><tr>
+        <th>Fecha</th><th>F.Pago</th><th>N°Factura</th><th>Sociedad</th>
+        <th>Ticker</th><th>Tipo</th><th class="num">Cantidad</th><th class="num">Monto CLP</th>
+      </tr></thead>
+      <tbody>
+        {% for m in data.movimientos|sort(attribute='Fecha', reverse=True) %}
+        <tr>
+          <td>{{ m.Fecha }}</td>
+          <td>{{ m.FechaPago }}</td>
+          <td style="font-size:.78rem;color:#666">{{ m['N°Factura'] }}</td>
+          <td><span class="nem">{{ m.Sociedad }}</span></td>
+          <td><span class="nem">{{ m.Ticker }}</span></td>
+          <td>
+            {% if m.Tipo == 'COMPRA' %}
+              <span class="badge" style="background:#e53935">COMPRA</span>
+            {% else %}
+              <span class="badge" style="background:#2e7d32">VENTA</span>
+            {% endif %}
+          </td>
+          <td class="num">{{ m.Cantidad|int|abs|string|replace(',','.') if m.Cantidad else '—' }}</td>
+          <td class="num">
+            {% if m.Monto %}$ {{ '{:,.0f}'.format(m.Monto|float)|replace(',','.') }}{% else %}—{% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" class="text-center text-muted py-3">Sin datos</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {# ── Dividendos ── #}
+  <div class="tab-pane fade p-0" id="tab-div">
+    <table class="tbl-cartera">
+      <thead><tr>
+        <th>Fecha Email</th><th>F.Pago</th><th>Instrumento</th>
+        <th>Moneda</th><th class="num">N°Acciones</th>
+        <th class="num">Val.Div/Acc</th><th class="num">Monto Total</th>
+      </tr></thead>
+      <tbody>
+        {% for d in data.dividendos|sort(attribute='FechaPago', reverse=True) %}
+        <tr>
+          <td>{{ d.Fecha }}</td>
+          <td>{{ d.FechaPago }}</td>
+          <td><span class="nem">{{ d.Instrumento }}</span></td>
+          <td>{{ d.Moneda }}</td>
+          <td class="num">{{ d.NroAcciones }}</td>
+          <td class="num">{{ d.ValorDivAccion }}</td>
+          <td class="num">
+            {% if d.MontoTotal %}$ {{ '{:,.0f}'.format(d.MontoTotal|float)|replace(',','.') }}{% else %}—{% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-center text-muted py-3">Sin datos</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {# ── Forwards ── #}
+  <div class="tab-pane fade p-0" id="tab-fwd">
+    <table class="tbl-cartera">
+      <thead><tr>
+        <th>Fecha</th><th>Sociedad</th><th>Folio</th>
+        <th class="num">Nominal USD</th><th>Tipo</th>
+        <th class="num">Precio Pac</th><th>F.Inicio</th>
+        <th>F.Vencimiento</th><th>F.Pago</th>
+      </tr></thead>
+      <tbody>
+        {% for f in data.forwards|sort(attribute='FechaInicio', reverse=True) %}
+        <tr>
+          <td style="font-size:.78rem">{{ f.Fecha }}</td>
+          <td><span class="nem">{{ f.Sociedad }}</span></td>
+          <td style="font-size:.78rem;color:#666">{{ f.FolioOp }}</td>
+          <td class="num">{{ f.Nominal }}</td>
+          <td>
+            {% if f.TipoCliente == 'Venta' %}
+              <span class="badge" style="background:#2e7d32">Venta</span>
+            {% else %}
+              <span class="badge" style="background:#e53935">Compra</span>
+            {% endif %}
+          </td>
+          <td class="num">{{ f.PrecioPac }}</td>
+          <td>{{ f.FechaInicio }}</td>
+          <td>{{ f.FechaVencimiento }}</td>
+          <td>{{ f.FechaPago }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="9" class="text-center text-muted py-3">Sin datos</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {# ── Transferencias ── #}
+  <div class="tab-pane fade p-0" id="tab-trans">
+    <table class="tbl-cartera">
+      <thead><tr>
+        <th>Fecha</th><th>Sociedad</th><th class="num">Monto</th>
+        <th>Descripción</th><th>Estado</th>
+      </tr></thead>
+      <tbody>
+        {% for t in data.transferencias %}
+        <tr>
+          <td>{{ t.Fecha }}</td>
+          <td><span class="nem">{{ t.Sociedad }}</span></td>
+          <td class="num">
+            {% if t.Monto %}$ {{ '{:,.0f}'.format(t.Monto|float)|replace(',','.') }}{% else %}—{% endif %}
+          </td>
+          <td>{{ t.Descripcion }}</td>
+          <td>
+            {% if t.Estado == 'Confirmada' %}
+              <span class="ok-badge">Confirmada</span>
+            {% else %}
+              <span class="vencida-badge">Pendiente</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-center text-muted py-3">Sin transferencias registradas</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {# ── Comparación ── #}
+  <div class="tab-pane fade p-0" id="tab-comp">
+    <table class="tbl-cartera">
+      <thead><tr>
+        <th>Fecha Cartola</th><th>Sociedad</th><th>Ticker</th>
+        <th class="num">Cartola</th><th class="num">Facturas</th>
+        <th class="num">Diferencia</th><th>Estado</th>
+      </tr></thead>
+      <tbody>
+        {% for c in data.comparacion %}
+        {% set dif = c.Diferencia|float %}
+        <tr {% if dif != 0 %}style="background:#fff3f3"{% endif %}>
+          <td style="font-size:.78rem">{{ c.FechaCartola }}</td>
+          <td><span class="nem">{{ c.Sociedad }}</span></td>
+          <td><span class="nem">{{ c.Ticker }}</span></td>
+          <td class="num">{{ '{:,.0f}'.format(c.CantCartola|float)|replace(',','.') }}</td>
+          <td class="num">{{ '{:,.0f}'.format(c.CantFacturas|float)|replace(',','.') }}</td>
+          <td class="num {% if dif < 0 %}neg{% elif dif > 0 %}pos{% endif %}">
+            {% if dif != 0 %}{{ '{:+,.0f}'.format(dif)|replace(',','.') }}{% else %}—{% endif %}
+          </td>
+          <td>
+            {% if dif == 0 %}
+              <span class="ok-badge">OK</span>
+            {% else %}
+              <span class="vencida-badge">{{ c.Estado }}</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-center text-muted py-3">Sin datos de comparación</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+{% endblock %}

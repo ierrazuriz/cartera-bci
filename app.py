@@ -226,6 +226,18 @@ def api_estado():
     })
 
 
+@app.route("/facturas")
+def facturas():
+    import json, os
+    json_path = os.path.join(DATA_DIR, "facturas_data.json")
+    try:
+        with open(json_path, encoding='utf-8') as f:
+            data = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        data = {'movimientos': [], 'dividendos': [], 'transferencias': [], 'forwards': [], 'comparacion': [], 'sync_at': ''}
+    return render_template("facturas.html", data=data, hoy=date.today())
+
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=False)
