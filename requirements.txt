@@ -2,4 +2,4 @@ flask>=3.0
 openpyxl>=3.1.5
 gunicorn>=21.0
 requests>=2.31
-yfinance>=0.2.50
+beautifulsoup4>=4.12

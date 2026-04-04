@@ -148,59 +148,124 @@ def download_excel():
         return f"Error generando Excel: {e}", 500
 
 
+def _parse_clp(text):
+    """Convierte precio en formato chileno '6.527,90' -> 6527.9"""
+    return float(text.strip().replace(".", "").replace(",", "."))
+
+
 @app.route("/api/precios_auto")
 def precios_auto():
-    """Obtiene precios actuales via yfinance (Yahoo Finance) + mindicador.cl para UF."""
-    import yfinance as yf
+    """Obtiene precios actuales desde mercadosenconsorcio.cl (scraping HTML)."""
+    from bs4 import BeautifulSoup
 
     precios = load_precios()
     errores = []
     actualizados = []
+    headers = {"User-Agent": "Mozilla/5.0"}
 
-    # ── Acciones y FX — yfinance ──────────────────────────────────────────
-    TICKERS_YF = {
-        "ABC":      "ABC.SN",
-        "AGUAS-A":  "AGUAS-A.SN",
-        "CENCOSUD": "CENCOSUD.SN",
-        "CHILE":    "CHILE.SN",
-        "COPEC":    "COPEC.SN",
-        "ENELAM":   "ENELAM.SN",
-        "LTM":      "LTM.SN",
-            "ITAUCL":   "ITAUCL.SN",
-        "USD":      "USDCLP=X",
-        "EUR":      "EURCLP=X",
-    }
+    ACCIONES_BUSCADAS = {"ABC", "AGUAS-A", "CENCOSUD", "CHILE", "COPEC", "ENELAM", "ITAUCL", "LTM"}
+
+    # ── 1. Página principal: monedas (UF, USD obs., EUR/USD) ──────────────
     try:
-        symbols = list(TICKERS_YF.values())
-        data = yf.download(symbols, period="1d", auto_adjust=True, progress=False)
-        closes = data["Close"].iloc[-1] if not data.empty else {}
-
-        sym_to_nem = {v: k for k, v in TICKERS_YF.items()}
-        for sym, precio in closes.items():
-            nem = sym_to_nem.get(sym)
-            if nem and precio and float(precio) > 0:
-                precios[nem] = round(float(precio), 4)
-                actualizados.append(nem)
-            elif nem:
-                errores.append(f"{nem}: sin precio en Yahoo Finance")
-    except Exception as e:
-        errores.append(f"yfinance: {e}")
-
-    # ── UF — mindicador.cl ────────────────────────────────────────────────
-    try:
-        r = _requests.get("https://mindicador.cl/api/uf", timeout=8)
+        r = _requests.get("https://mercadosenconsorcio.cl/mercado/acciones", timeout=12, headers=headers)
         r.raise_for_status()
-        uf_val = r.json()["serie"][0]["valor"]
-        precios["UF"] = round(float(uf_val), 2)
-        actualizados.append("UF")
-    except Exception as e:
-        errores.append(f"UF (mindicador.cl): {e}")
+        soup = BeautifulSoup(r.text, "html.parser")
 
+        usd_obs = None
+        eur_usd = None
+
+        for table in soup.find_all("table"):
+            th = table.find("th")
+            if not th or "Moneda" not in th.get_text():
+                continue
+            for row in table.find_all("tr"):
+                nemo_s = row.find("span", class_="instrument")
+                price_s = row.find("span", attrs={"data-bind": "text: price"})
+                if not (nemo_s and price_s):
+                    continue
+                name = nemo_s.get_text(strip=True).upper()
+                try:
+                    val = _parse_clp(price_s.get_text(strip=True))
+                except ValueError:
+                    continue
+                if "OBS" in name:
+                    usd_obs = val
+                elif "EUR" in name and "USD" in name:
+                    eur_usd = val
+                elif name == "UF":
+                    precios["UF"] = round(val, 2)
+                    actualizados.append("UF")
+
+        if usd_obs:
+            precios["USD"] = round(usd_obs, 2)
+            actualizados.append("USD")
+        if eur_usd and usd_obs:
+            precios["EUR"] = round(eur_usd * usd_obs, 2)
+            actualizados.append("EUR")
+
+        # Recoger acciones que aparezcan en las secciones top de la página
+        for row in soup.find_all("tr"):
+            nemo_s = row.find("span", class_="instrument")
+            price_s = row.find("span", attrs={"data-bind": "text: price"})
+            if not (nemo_s and price_s):
+                continue
+            nemo = nemo_s.get_text(strip=True)
+            if nemo not in ACCIONES_BUSCADAS:
+                continue
+            try:
+                val = _parse_clp(price_s.get_text(strip=True))
+            except ValueError:
+                continue
+            if val > 0:
+                precios[nemo] = round(val, 4)
+                if nemo not in actualizados:
+                    actualizados.append(nemo)
+
+    except Exception as e:
+        errores.append(f"mercadosenconsorcio (página principal): {e}")
+
+    # ── 2. Constituyentes IPSA: cubre las acciones no en las secciones top ─
+    faltantes = ACCIONES_BUSCADAS - set(actualizados)
+    if faltantes:
+        try:
+            r = _requests.post(
+                "https://mercadosenconsorcio.cl/www/global/constituyentes.html",
+                data={"ORDER": "VOLUME", "SORT": "desc", "HASH": "x"},
+                headers={**headers, "X-Requested-With": "XMLHttpRequest",
+                         "Referer": "https://mercadosenconsorcio.cl/www/detalle.html"},
+                timeout=12,
+            )
+            r.raise_for_status()
+            soup2 = BeautifulSoup(r.text, "html.parser")
+            for row in soup2.find_all("tr"):
+                nemo_s = row.find("span", class_="instrumentList")
+                price_s = row.find("span", attrs={"data-bind": "text: price"})
+                if not (nemo_s and price_s):
+                    continue
+                nemo = nemo_s.get_text(strip=True)
+                if nemo not in faltantes:
+                    continue
+                try:
+                    val = _parse_clp(price_s.get_text(strip=True))
+                except ValueError:
+                    continue
+                if val > 0:
+                    precios[nemo] = round(val, 4)
+                    actualizados.append(nemo)
+                    faltantes.discard(nemo)
+        except Exception as e:
+            errores.append(f"mercadosenconsorcio (constituyentes): {e}")
+
+    # Stocks no encontrados (ej. ABC, fuera del IPSA): conservan precio anterior
+    for nem in faltantes:
+        errores.append(f"{nem}: no encontrado en mercadosenconsorcio.cl (se mantiene precio anterior)")
+
+    save_precios(precios)
     return jsonify({
-        "precios":      precios,
+        "precios":    precios,
         "actualizados": actualizados,
-        "errores":      errores,
-                    "manuales":    ["CFIARRAA-E"],
+        "errores":    errores,
+        "manuales":   ["CFIARRAA-E", "CFIMRCLP", "CFITRIPT-E", "ABC"],
     })
 
 
