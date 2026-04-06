@@ -5,13 +5,14 @@ En Railway: gunicorn app:app
 """
 import os
 import json
+import logging
+import threading
 import requests as _requests
 from datetime import date
 from flask import Flask, render_template, request, redirect, url_for, send_file, jsonify
 from cartera_calc import (
     calcular_el, calcular_emf,
     PRECIOS_DEFAULT, INSTRUMENTOS_META,
-    EL_ACCIONES, EL_CFI, EL_SIM, EMF_CFI, EMF_FWD,
 )
 
 app = Flask(__name__)
@@ -303,6 +304,88 @@ def facturas():
     return render_template("facturas.html", data=data, hoy=date.today())
 
 
+@app.route("/api/actualizar_cartola", methods=["POST"])
+def actualizar_cartola():
+    """
+    Descarga la cartola de hoy desde Gmail y actualiza cartola_data.json.
+    Llamado por el scheduler diario o manualmente.
+    """
+    token = request.headers.get("X-Actualizar-Token", "")
+    secret = os.environ.get("ACTUALIZAR_SECRET", "")
+    if secret and token != secret:
+        return jsonify({"error": "no autorizado"}), 403
+
+    def _run():
+        try:
+            import gmail_bci as gb
+            import parsear_cartola as pc
+            logging.info("Actualizando cartola desde Gmail...")
+            creds   = gb.autenticar()
+            service = gb.build("gmail", "v1", credentials=creds)
+            msg_id  = gb.buscar_email_bci(service)
+            zip_data, zip_name, fecha_email = gb.descargar_zip(service, msg_id)
+            pdfs    = gb.extraer_pdfs(zip_data)
+            data    = pc.parsear(pdfs)
+            pc.guardar(data)
+            logging.info("Cartola actualizada: %s", data.get("fecha"))
+        except Exception as e:
+            logging.error("Error actualizando cartola: %s", e)
+
+    threading.Thread(target=_run, daemon=True).start()
+    return jsonify({"status": "actualizando en segundo plano"})
+
+
+# ── Scheduler diario ─────────────────────────────────────────────────────────
+
+def _iniciar_scheduler():
+    """Corre la actualización de cartola cada día hábil a las 09:30 hora Chile."""
+    import time
+    from datetime import datetime
+    import zoneinfo
+
+    TZ_CHILE = zoneinfo.ZoneInfo("America/Santiago")
+
+    def _loop():
+        ultimo_dia = None
+        while True:
+            try:
+                ahora = datetime.now(TZ_CHILE)
+                hoy   = ahora.date()
+                es_habil = ahora.weekday() < 5
+                hora_ok  = ahora.hour == 9 and ahora.minute >= 30
+                if es_habil and hora_ok and hoy != ultimo_dia:
+                    logging.info("Scheduler: iniciando actualización de cartola")
+                    try:
+                        import gmail_bci as gb
+                        import parsear_cartola as pc
+                        creds   = gb.autenticar()
+                        service = gb.build("gmail", "v1", credentials=creds)
+                        msg_id  = gb.buscar_email_bci(service)
+                        zip_data, _, _ = gb.descargar_zip(service, msg_id)
+                        pdfs    = gb.extraer_pdfs(zip_data)
+                        data    = pc.parsear(pdfs)
+                        pc.guardar(data)
+                        ultimo_dia = hoy
+                        logging.info("Scheduler: cartola actualizada (%s)", hoy)
+                    except Exception as e:
+                        logging.error("Scheduler: error en actualización: %s", e)
+            except Exception as e:
+                logging.error("Scheduler loop error: %s", e)
+            time.sleep(60)
+
+    t = threading.Thread(target=_loop, daemon=True)
+    t.start()
+    logging.info("Scheduler de cartola iniciado (09:30 hora Chile, días hábiles)")
+
+
+logging.basicConfig(level=logging.INFO)
+
+# Solo iniciar el scheduler en producción (Railway) para evitar dobles en dev
+if os.environ.get("RAILWAY_ENVIRONMENT") or os.environ.get("INICIAR_SCHEDULER"):
+    _iniciar_scheduler()
+
+
 if __name__ == "__main__":
+    _iniciar_scheduler()
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=False)
