@@ -211,7 +211,7 @@ def calcular_el(precios, hoy=None):
             "cant_activo": cant_a, "cant_pasivo": cant_p,
             "precio_cartola": p_c, "precio_hoy": p,
             "valor_activo": va, "valor_pasivo": vp,
-            "valor_neto": va + vp,
+            "valor_neto": va - vp,
             "var_pct": (p - p_c) / p_c if p_c else 0,
         })
 
