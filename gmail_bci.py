@@ -1,12 +1,17 @@
 """
 Descargador de cartolas BCI desde Gmail.
 
+=== FIX 3 APLICADO ===
+Antes: from:"Unidad Comercial Bci" (display name que podía no matchear)
+Ahora: from:soportecomercialcb@bci.cl (email exacto del sender)
+
 Uso:
-  python gmail_bci.py                  # descarga y procesa última cartola
-  python gmail_bci.py --mostrar        # muestra texto crudo de los PDFs (para debug)
-  python gmail_bci.py --guardar        # guarda los PDFs en ./cartolas/
-  python gmail_bci.py --fecha 2026-04-01  # busca cartola de una fecha específica
+    python gmail_bci.py                # descarga y procesa última cartola
+    python gmail_bci.py --mostrar      # muestra texto crudo de los PDFs
+    python gmail_bci.py --guardar      # guarda los PDFs en ./cartolas/
+    python gmail_bci.py --fecha 2026-04-01  # busca cartola de fecha específica
 """
+
 import os
 import io
 import json
@@ -20,21 +25,22 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
+
 import pdfplumber
 
 # ── Configuración ─────────────────────────────────────────────────────────────
 
-SCOPES            = ["https://www.googleapis.com/auth/gmail.readonly"]
-CREDENTIALS_FILE  = "credentials.json"   # bajar desde Google Cloud Console
-TOKEN_FILE        = "token.json"          # se genera automáticamente la primera vez
+SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
+CREDENTIALS_FILE = "credentials.json"
+TOKEN_FILE = "token.json"
 
-# RUTs que mapean cada PDF a una entidad (sin puntos ni guion)
+# RUTs que mapean cada PDF a una entidad
 RUTS = {
-    "76677950": "EL",   # EL LTDA  (76.677.950-6)
-    "77209686": "EMF",  # EMF SPA  (77.209.686-0)
+    "76677950": "EL",   # EL LTDA (76.677.950-6)
+    "77209686": "EMF",  # EMF SPA (77.209.686-0)
 }
 
-DATA_DIR  = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(DATA_DIR, "precios.json")
 
 
@@ -44,7 +50,7 @@ def autenticar():
     """
     OAuth 2.0.
     En Railway: lee el token desde la variable de entorno GMAIL_TOKEN_JSON.
-    Localmente: usa token.json (se genera la primera vez abriendo el navegador).
+    Localmente: usa token.json.
     """
     creds = None
 
@@ -60,7 +66,7 @@ def autenticar():
     # 3. Refrescar si expiró
     if creds and creds.expired and creds.refresh_token:
         creds.refresh(Request())
-        # Guardar localmente si existe el archivo
+        # Guardar localmente si aplica
         if os.path.exists(TOKEN_FILE) or not token_env:
             with open(TOKEN_FILE, "w") as f:
                 f.write(creds.to_json())
@@ -85,19 +91,22 @@ def autenticar():
 def buscar_email_bci(service, fecha: date = None):
     """
     Busca el email más reciente de BCI con adjunto ZIP.
-    Si se pasa fecha, busca dentro de ese día.
+
+    FIX 3: usa from:soportecomercialcb@bci.cl (email exacto)
+    en vez de from:"Unidad Comercial Bci" (display name).
     """
-    query = 'from:"Unidad Comercial Bci" has:attachment filename:zip'
+    # ── Query corregida ──
+    query = 'from:soportecomercialcb@bci.cl has:attachment filename:zip'
+
     if fecha:
-        # Gmail usa formato YYYY/MM/DD para after:/before:
         d_str = fecha.strftime("%Y/%m/%d")
-        next_day = fecha.toordinal() + 1
-        d_next   = date.fromordinal(next_day).strftime("%Y/%m/%d")
+        d_next = date.fromordinal(fecha.toordinal() + 1).strftime("%Y/%m/%d")
         query += f" after:{d_str} before:{d_next}"
 
     result = service.users().messages().list(
         userId="me", q=query, maxResults=1
     ).execute()
+
     messages = result.get("messages", [])
     if not messages:
         raise ValueError(
@@ -113,24 +122,21 @@ def descargar_zip(service, msg_id: str):
         userId="me", id=msg_id, format="full"
     ).execute()
 
-    # Fecha del email
-    headers  = {h["name"]: h["value"] for h in msg["payload"].get("headers", [])}
+    headers = {h["name"]: h["value"] for h in msg["payload"].get("headers", [])}
     fecha_hdr = headers.get("Date", "")
 
-    # Recorrer partes del mensaje buscando el ZIP
     def buscar_adjunto(parts):
         for part in parts:
             fname = part.get("filename", "")
             if fname.lower().endswith(".zip"):
-                body   = part.get("body", {})
+                body = part.get("body", {})
                 att_id = body.get("attachmentId")
                 if att_id:
-                    att  = service.users().messages().attachments().get(
+                    att = service.users().messages().attachments().get(
                         userId="me", messageId=msg_id, id=att_id
                     ).execute()
                     data = base64.urlsafe_b64decode(att["data"])
                     return data, fname
-            # Recursivo para multipart
             subparts = part.get("parts", [])
             if subparts:
                 result = buscar_adjunto(subparts)
@@ -152,7 +158,7 @@ def descargar_zip(service, msg_id: str):
 def extraer_pdfs(zip_data: bytes) -> dict:
     """
     Extrae los PDFs del ZIP.
-    Retorna dict: {'EL': ('nombre.pdf', bytes), 'EMF': (...), 'OTRO': (...)}
+    Retorna dict: {'EL': ('nombre.pdf', bytes), 'EMF': (...)}
     """
     pdfs = {}
     with zipfile.ZipFile(io.BytesIO(zip_data)) as z:
@@ -160,7 +166,6 @@ def extraer_pdfs(zip_data: bytes) -> dict:
             if not nombre.lower().endswith(".pdf"):
                 continue
             contenido = z.read(nombre)
-            # Determinar entidad por RUT en el nombre del archivo
             rut_key = None
             nombre_limpio = nombre.replace(".", "").replace("-", "").replace(" ", "")
             for rut, key in RUTS.items():
@@ -168,7 +173,6 @@ def extraer_pdfs(zip_data: bytes) -> dict:
                     rut_key = key
                     break
             if rut_key is None:
-                # Usar nombre de archivo como clave si no coincide ningún RUT
                 rut_key = Path(nombre).stem
             pdfs[rut_key] = (nombre, contenido)
     return pdfs
@@ -182,15 +186,11 @@ def extraer_texto_pdf(pdf_bytes: bytes) -> str:
     with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
         for i, page in enumerate(pdf.pages):
             lineas.append(f"\n{'─'*60}")
-            lineas.append(f"  PÁGINA {i + 1}")
+            lineas.append(f" PÁGINA {i + 1}")
             lineas.append(f"{'─'*60}")
-
-            # Texto plano
             texto = page.extract_text()
             if texto:
                 lineas.append(texto)
-
-            # Tablas
             tablas = page.extract_tables()
             for j, tabla in enumerate(tablas):
                 lineas.append(f"\n  [Tabla {j + 1}]")
@@ -203,7 +203,6 @@ def extraer_texto_pdf(pdf_bytes: bytes) -> str:
 # ── Guardar PDFs localmente ───────────────────────────────────────────────────
 
 def guardar_pdfs(pdfs: dict, directorio: str = "cartolas"):
-    """Guarda los PDFs en una carpeta local para inspección."""
     Path(directorio).mkdir(exist_ok=True)
     hoy = date.today().strftime("%Y%m%d")
     for key, (nombre, contenido) in pdfs.items():
@@ -217,73 +216,66 @@ def guardar_pdfs(pdfs: dict, directorio: str = "cartolas"):
 
 def main():
     parser = argparse.ArgumentParser(description="Descargador de cartolas BCI desde Gmail")
-    parser.add_argument("--mostrar", action="store_true",
-                        help="Muestra el texto extraído de los PDFs (útil para debug)")
-    parser.add_argument("--guardar", action="store_true",
-                        help="Guarda los PDFs en la carpeta ./cartolas/")
-    parser.add_argument("--fecha", type=str, default=None,
-                        help="Fecha del email a buscar (YYYY-MM-DD). Por defecto: el más reciente.")
+    parser.add_argument("--mostrar", action="store_true")
+    parser.add_argument("--guardar", action="store_true")
+    parser.add_argument("--fecha", type=str, default=None)
     args = parser.parse_args()
 
     fecha = None
     if args.fecha:
         fecha = datetime.strptime(args.fecha, "%Y-%m-%d").date()
 
-    # 1. Autenticar
     print("Autenticando con Gmail...")
-    creds   = autenticar()
+    creds = autenticar()
     service = build("gmail", "v1", credentials=creds)
     print("  OK")
 
-    # 2. Buscar email
     print(f"Buscando email de BCI{' del ' + str(fecha) if fecha else ''}...")
     msg_id = buscar_email_bci(service, fecha)
     print(f"  Encontrado (id: {msg_id})")
 
-    # 3. Descargar ZIP
     print("Descargando adjunto ZIP...")
     zip_data, zip_name, fecha_email = descargar_zip(service, msg_id)
-    print(f"  {zip_name}  ({len(zip_data):,} bytes)  —  {fecha_email}")
+    print(f"  {zip_name} ({len(zip_data):,} bytes) — {fecha_email}")
 
-    # 4. Extraer PDFs
     print("Extrayendo PDFs del ZIP...")
     pdfs = extraer_pdfs(zip_data)
     for key, (nombre, data) in pdfs.items():
-        print(f"  [{key}]  {nombre}  ({len(data):,} bytes)")
+        print(f"  [{key}] {nombre} ({len(data):,} bytes)")
 
     if not pdfs:
         print("ERROR: No se encontraron PDFs dentro del ZIP.")
         return
 
-    # 5. Guardar localmente si se pidió
     if args.guardar:
         print("Guardando PDFs...")
         guardar_pdfs(pdfs)
 
-    # 6. Mostrar texto crudo si se pidió
     if args.mostrar:
         for key, (nombre, data) in pdfs.items():
             print(f"\n{'='*60}")
-            print(f"  PDF: {key}  ({nombre})")
+            print(f"  PDF: {key} ({nombre})")
             print(f"{'='*60}")
             print(extraer_texto_pdf(data))
 
-    # 7. Parsear y guardar cartola_data.json
     print("\nParsando cartola...")
     import parsear_cartola as pc
     cartola_data = pc.parsear(pdfs)
     pc.guardar(cartola_data)
+
     precios = cartola_data.get("precios", {})
     print(f"  Precios actualizados: {', '.join(precios.keys())}")
-    el_caja  = cartola_data.get("el",  {}).get("caja")
+
+    el_caja = cartola_data.get("el", {}).get("caja")
     emf_caja = cartola_data.get("emf", {}).get("caja")
     if el_caja is not None:
-        print(f"  Caja EL:  {el_caja:,}")
+        print(f"  Caja EL: {el_caja:,}")
     if emf_caja is not None:
         print(f"  Caja EMF: {emf_caja:,}")
-    n_sims = len(cartola_data.get("el",  {}).get("sims", []))
+
+    n_sims = len(cartola_data.get("el", {}).get("sims", []))
     n_fwds = len(cartola_data.get("emf", {}).get("fwds", []))
-    print(f"  Simultáneas EL: {n_sims}  |  Forwards EMF: {n_fwds}")
+    print(f"  Simultáneas EL: {n_sims} | Forwards EMF: {n_fwds}")
     print("Listo.")
 
 

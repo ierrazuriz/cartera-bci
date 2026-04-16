@@ -1,40 +1,42 @@
 """
 Parser de cartolas BCI.
-
 Extrae de los PDFs de EL LTDA y EMF SPA:
-  - precios (UF, USD, EUR, acciones, CFIs)
-  - posiciones de acciones (cant_activo, cant_pasivo)
-  - posiciones CFI
-  - simultáneas EL
-  - caja EL y EMF
-  - forwards EMF
+ - precios (UF, USD, EUR, acciones, CFIs)
+ - posiciones de acciones (cant_activo, cant_pasivo)
+ - posiciones CFI
+ - simultáneas EL
+ - caja EL y EMF
+ - forwards EMF
+ - ops_liquidar
 
-Genera cartola_data.json con toda la información.
+=== BUGS CORREGIDOS ===
+1. cant_activo = Libre + En Garantía + Saldo a Plazo (antes solo usaba En Garantía)
+   "Saldo a Plazo" son acciones propias en simultáneas, NO son pasivo
+2. cant_pasivo viene de la línea "Pasivo:" (antes usaba -Saldo_a_Plazo, que era incorrecto)
+3. Se extrae ops_liquidar del resumen de inversiones
+4. Caja se lee correctamente (ya incluye ops_liquidar cuando es 0)
 """
+
 import re
 import json
 import io
 from datetime import datetime, date
 from pathlib import Path
-
 import pdfplumber
 
-DATA_DIR  = Path(__file__).parent
+DATA_DIR = Path(__file__).parent
 DATA_FILE = DATA_DIR / "cartola_data.json"
 
-# RUTs conocidos
-RUT_EL  = "76677950"
+RUT_EL = "76677950"
 RUT_EMF = "77209686"
-
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def _num(s: str) -> float:
-    """Convierte '1.234,56' → 1234.56  y  '-856.291.313' → -856291313."""
+    """Convierte '1.234,56' → 1234.56 y '-856.291.313' → -856291313."""
     s = s.strip().replace("\xa0", "").replace(" ", "")
     negativo = s.startswith("-")
     s = s.lstrip("-")
-    # Si tiene coma → formato chileno (punto=miles, coma=decimal)
     if "," in s:
         s = s.replace(".", "").replace(",", ".")
     else:
@@ -54,7 +56,6 @@ def _fecha(s: str) -> str:
 
 
 def _texto_pdf(pdf_bytes: bytes) -> str:
-    """Extrae texto plano de todas las páginas."""
     lineas = []
     with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
         for page in pdf.pages:
@@ -81,52 +82,86 @@ def _extraer_precios_cabecera(texto: str) -> dict:
 
 
 # ── Extracción de acciones (EL) ───────────────────────────────────────────────
+# Formato del PDF (pdfplumber):
+# ABC Activo: 0 0 23.210.430 0 11,7800 12,6200 292.915.627 0
+# Rubro: Comerciales y Distribuidoras Pasivo: 0 0 0 0 12,6200 0 0
+#
+# Columnas Activo: Libre | Saldo Préstamo | En Garantía | Saldo a Plazo | Precio Compra | Precio Último | Valor Mercado | Dividendos
+# Columnas Pasivo: Libre | Saldo Préstamo | En Garantía | Saldo a Plazo | Precio Último | Valor Mercado | Dividendos
 
-# Ejemplo de línea:
-# "ABC Activo: 0 0 23.210.430 0 11,7800 12,1500 282.006.725 0"
-_RE_ACCION = re.compile(
+# Regex para línea Activo
+_RE_ACCION_ACTIVO = re.compile(
     r"^([A-Z][A-Z0-9\-]+)\s+Activo:\s+"
-    r"([\d\.]+)\s+([\d\.]+)\s+([\d\.]+)\s+([\d\.]+)\s+"
-    r"([\d\.,]+)\s+([\d\.,]+)",
+    r"([\d\.]+)\s+([\d\.]+)\s+([\d\.]+)\s+([\d\.]+)\s+"  # libre, prestamo, en_garantia, a_plazo
+    r"([\d\.,]+)\s+([\d\.,]+)",                           # precio_compra, precio_ultimo
     re.MULTILINE,
 )
 
+# Regex para línea Pasivo (puede estar en la siguiente línea o dos después)
+_RE_ACCION_PASIVO = re.compile(
+    r"Pasivo:\s+(-?[\d\.]+)\s+(-?[\d\.]+)\s+(-?[\d\.]+)\s+(-?[\d\.]+)\s+"  # libre, prestamo, en_garantia, a_plazo
+    r"([\d\.,]+)\s+(-?[\d\.,]+)",                                            # precio_ultimo, valor_mercado
+    re.MULTILINE,
+)
+
+
 def _extraer_acciones(texto: str) -> list:
     """
-    Retorna lista de dicts:
-      nem, cant_activo (en_garantia), cant_pasivo (-a_plazo),
-      precio_compra, precio_cartola
-    Excluye CFIs (que tienen estructura de columnas distinta).
+    Retorna lista de dicts con posiciones de acciones.
+    
+    FIX: cant_activo = Libre + En Garantía + Saldo a Plazo (total acciones propias)
+         cant_pasivo = viene de la línea Pasivo: columna Libre (acciones vendidas en contado de sim)
     """
     acciones = []
-    for m in _RE_ACCION.finditer(texto):
-        nem = m.group(1)
+    lineas = texto.splitlines()
+    
+    for i, linea in enumerate(lineas):
+        m_act = _RE_ACCION_ACTIVO.match(linea.strip())
+        if not m_act:
+            continue
+            
+        nem = m_act.group(1)
         if nem.startswith("CFI"):
             continue
-        en_garantia = int(_num(m.group(4)))
-        a_plazo     = int(_num(m.group(5)))
-        p_compra    = _num(m.group(6))
-        p_ultimo    = _num(m.group(7))
-
-        # cant_activo = acciones físicamente en la cuenta (en garantía de sim)
-        # cant_pasivo = acciones vendidas en el contado de la sim (negativo)
+        
+        libre = int(_num(m_act.group(2)))
+        # prestamo = int(_num(m_act.group(3)))  # no lo usamos
+        en_garantia = int(_num(m_act.group(4)))
+        a_plazo = int(_num(m_act.group(5)))
+        p_compra = _num(m_act.group(6))
+        p_ultimo = _num(m_act.group(7))
+        
+        # FIX 1: cant_activo es la suma de TODAS las posiciones activas
+        cant_activo = libre + en_garantia + a_plazo
+        
+        # FIX 2: buscar la línea Pasivo: en las siguientes líneas
+        cant_pasivo = 0
+        for j in range(i + 1, min(i + 4, len(lineas))):
+            m_pas = _RE_ACCION_PASIVO.search(lineas[j])
+            if m_pas:
+                pas_libre = int(_num(m_pas.group(1)))
+                # Si hay valor negativo en Libre, es la cantidad pasiva
+                if pas_libre != 0:
+                    cant_pasivo = pas_libre  # ya viene negativo del PDF
+                break
+        
         acciones.append({
-            "nem":            nem,
-            "cant_activo":    en_garantia,
-            "cant_pasivo":    -a_plazo,
-            "precio_compra":  p_compra,
+            "nem": nem,
+            "cant_activo": cant_activo,
+            "cant_pasivo": cant_pasivo,
+            "precio_compra": p_compra,
             "precio_cartola": p_ultimo,
         })
+    
     return acciones
 
 
 # ── Extracción de CFIs ────────────────────────────────────────────────────────
 
-# Ejemplo: "CFIARRAA-E Activo: 4.187 0 0 0 48.138,4240 51.702,0000 216.476.274 640.475"
 _RE_CFI = re.compile(
     r"^(CFI[A-Z0-9\-]+)\s+Activo:\s+"
-    r"([\d\.]+)\s+[\d\.]+\s+[\d\.]+\s+[\d\.]+\s+"
-    r"([\d\.,]+)\s+([\d\.,]+)",
+    r"([\d\.]+)\s+([\d\.]+)\s+([\d\.]+)\s+([\d\.]+)\s+"  # libre, prestamo, en_garantia, a_plazo
+    r"([\d\.,]+)\s+([\d\.,]+)",                           # precio_compra, precio_ultimo
     re.MULTILINE,
 )
 
@@ -138,28 +173,28 @@ def _extraer_cfis(texto: str) -> list:
         if nem in vistas:
             continue
         vistas.add(nem)
+        # FIX: sum all quantity columns (Libre + En Garantía + Saldo a Plazo)
+        libre = int(_num(m.group(2)))
+        en_garantia = int(_num(m.group(4)))
+        a_plazo = int(_num(m.group(5)))
+        cantidad = libre + en_garantia + a_plazo
         cfis.append({
-            "nem":            nem,
-            "cantidad":       int(_num(m.group(2))),
-            "precio_compra":  _num(m.group(3)),
-            "precio_cartola": _num(m.group(4)),
+            "nem": nem,
+            "cantidad": cantidad,
+            "precio_compra": _num(m.group(6)),
+            "precio_cartola": _num(m.group(7)),
         })
     return cfis
 
 
 # ── Extracción de simultáneas (EL) ───────────────────────────────────────────
 
-# Ejemplo de 2 líneas consecutivas:
-# "AGUAS-A 438.600 28días 0,47%Venta Contado: 26-03-2026 347,000 152.194.200 152.456.481 ..."
-# "Compra Plazo: 23-04-2026 348,522 152.861.837"
-#
-# Nota: el precio por acción usa coma decimal (ej. "347,000" = 347.000 CLP)
-# mientras que los montos usan punto como separador de miles (ej. "152.194.200")
 _RE_SIM1 = re.compile(
     r"^([A-Z][A-Z0-9\-]+)\s+([\d\.]+)\s+\d+días\s+[\d,]+%Venta Contado:\s*(\d{2}-\d{2}-\d{4})\s+"
-    r"[\d.,]+\s+([\d\.]+)",         # precio_contado (puede tener punto y coma), luego monto_venta
+    r"[\d.,]+\s+([\d\.]+)",
     re.MULTILINE,
 )
+
 _RE_SIM2 = re.compile(r"Compra Plazo:\s*(\d{2}-\d{2}-\d{4})\s+[\d\.,]+\s+([\d\.]+)")
 
 def _extraer_sims(texto: str) -> list:
@@ -170,22 +205,22 @@ def _extraer_sims(texto: str) -> list:
         m1 = _RE_SIM1.match(lineas[i].strip())
         if m1:
             instrumento = m1.group(1)
-            cantidad    = int(_num(m1.group(2)))
-            f_venta     = _fecha(m1.group(3))
+            cantidad = int(_num(m1.group(2)))
+            f_venta = _fecha(m1.group(3))
             monto_venta = int(_num(m1.group(4)))
-            # Buscar la siguiente línea con "Compra Plazo:"
+
             for j in range(i+1, min(i+4, len(lineas))):
                 m2 = _RE_SIM2.search(lineas[j])
                 if m2:
-                    f_compra     = _fecha(m2.group(1))
+                    f_compra = _fecha(m2.group(1))
                     monto_compra = int(_num(m2.group(2)))
                     sims.append({
                         "instrumento": instrumento,
-                        "cantidad":    cantidad,
-                        "f_venta":     f_venta,
+                        "cantidad": cantidad,
+                        "f_venta": f_venta,
                         "monto_venta": monto_venta,
-                        "f_compra":    f_compra,
-                        "monto_compra":monto_compra,
+                        "f_compra": f_compra,
+                        "monto_compra": monto_compra,
                     })
                     break
         i += 1
@@ -203,17 +238,27 @@ def _extraer_caja(texto: str) -> int:
     return 0
 
 
+# ── Extracción de Operaciones por Liquidar ────────────────────────────────────
+
+_RE_OPS_LIQ = re.compile(r"Operaciones por Liquidar\s+([\d\.]+)")
+
+def _extraer_ops_liquidar(texto: str) -> int:
+    m = _RE_OPS_LIQ.search(texto)
+    if m:
+        val = int(_num(m.group(1)))
+        return val
+    return 0
+
+
 # ── Extracción de forwards (EMF) ──────────────────────────────────────────────
 
-# Ejemplo:
-# "1834140 Compra Seguro de Cambio Nominal 500.000,00 USD/CLP Fecha Inicio01-04-2026 Total 7 916,760000 ..."
-# "Fecha Termino08-04-2026 Residual 2"
 _RE_FWD1 = re.compile(
     r"^(\d{7})\s+(Compra|Venta)\s+Seguro de Cambio Nominal\s+"
     r"([\d\.,]+)\s+USD/CLP\s+Fecha Inicio(\d{2}-\d{2}-\d{4})\s+"
     r"Total\s+\d+\s+([\d\.,]+)",
     re.MULTILINE,
 )
+
 _RE_FWD2 = re.compile(r"Fecha Termino(\d{2}-\d{2}-\d{4})")
 
 def _extraer_forwards(texto: str) -> list:
@@ -223,21 +268,22 @@ def _extraer_forwards(texto: str) -> list:
     while i < len(lineas):
         m1 = _RE_FWD1.match(lineas[i].strip())
         if m1:
-            folio    = int(m1.group(1))
-            tipo     = "C" if m1.group(2) == "Compra" else "V"
-            usd      = int(_num(m1.group(3)))
+            folio = int(m1.group(1))
+            tipo = "C" if m1.group(2) == "Compra" else "V"
+            usd = int(_num(m1.group(3)))
             f_inicio = _fecha(m1.group(4))
-            tc_fwd   = _num(m1.group(5))
+            tc_fwd = _num(m1.group(5))
+
             for j in range(i+1, min(i+4, len(lineas))):
                 m2 = _RE_FWD2.search(lineas[j])
                 if m2:
                     f_termino = _fecha(m2.group(1))
                     fwds.append({
-                        "folio":     folio,
-                        "tipo":      tipo,
-                        "usd":       usd,
-                        "tc_fwd":    tc_fwd,
-                        "f_inicio":  f_inicio,
+                        "folio": folio,
+                        "tipo": tipo,
+                        "usd": usd,
+                        "tc_fwd": tc_fwd,
+                        "f_inicio": f_inicio,
                         "f_termino": f_termino,
                     })
                     break
@@ -248,15 +294,11 @@ def _extraer_forwards(texto: str) -> list:
 # ── Parser principal ──────────────────────────────────────────────────────────
 
 def parsear(pdfs: dict) -> dict:
-    """
-    pdfs: dict {'EL': ('nombre.pdf', bytes), 'EMF': ...}
-    Retorna el dict de cartola_data.
-    """
     resultado = {
-        "fecha":   date.today().isoformat(),
+        "fecha": date.today().isoformat(),
         "precios": {},
-        "el":      {},
-        "emf":     {},
+        "el": {},
+        "emf": {},
     }
 
     # ── EL ────────────────────────────────────────────────────────────────────
@@ -277,12 +319,14 @@ def parsear(pdfs: dict) -> dict:
 
         sims = _extraer_sims(texto_el)
         caja_el = _extraer_caja(texto_el)
+        ops_liquidar = _extraer_ops_liquidar(texto_el)
 
         resultado["el"] = {
-            "caja":     caja_el,
+            "caja": caja_el,
+            "ops_liquidar": ops_liquidar,
             "acciones": acciones,
-            "cfis":     cfis_el,
-            "sims":     sims,
+            "cfis": cfis_el,
+            "sims": sims,
         }
 
     # ── EMF ───────────────────────────────────────────────────────────────────
@@ -297,7 +341,7 @@ def parsear(pdfs: dict) -> dict:
         for c in cfis_emf:
             resultado["precios"].setdefault(c["nem"], c["precio_cartola"])
 
-        fwds  = _extraer_forwards(texto_emf)
+        fwds = _extraer_forwards(texto_emf)
         caja_emf = _extraer_caja(texto_emf)
 
         resultado["emf"] = {
@@ -328,7 +372,6 @@ def cargar(path: Path = DATA_FILE) -> dict | None:
 if __name__ == "__main__":
     import sys
     import zipfile
-    import base64
 
     if len(sys.argv) < 2:
         print("Uso: python parsear_cartola.py <archivo.zip>")
