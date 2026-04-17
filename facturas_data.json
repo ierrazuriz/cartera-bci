@@ -1,5 +1,5 @@
 {
-  "sync_at": "2026-04-16T09:15:24.361755",
+  "sync_at": "2026-04-17T10:38:58.665511",
   "movimientos": [
     {
       "Fecha": "2026-04-01",
@@ -1059,6 +1059,16 @@
       "NroAcciones": "5000",
       "ValorDivAccion": "437.01699",
       "MontoTotal": "2185085"
+    },
+    {
+      "Fecha": "16 Apr 202",
+      "FechaPago": "2026-04-20",
+      "Sociedad": "EL",
+      "Instrumento": "ITAUCL",
+      "Moneda": "CLP",
+      "NroAcciones": "3801",
+      "ValorDivAccion": "1187.2706855",
+      "MontoTotal": "4512816"
     }
   ],
   "transferencias": [],
@@ -3451,7 +3461,7 @@
   ],
   "comparacion": [
     {
-      "FechaCartola": "2026-04-16",
+      "FechaCartola": "2026-04-17",
       "Sociedad": "EL",
       "Ticker": "ABC",
       "CantCartola": "23210430",
@@ -3460,7 +3470,7 @@
       "Estado": "Solo en cartola"
     },
     {
-      "FechaCartola": "2026-04-16",
+      "FechaCartola": "2026-04-17",
       "Sociedad": "EL",
       "Ticker": "AGUAS-A",
       "CantCartola": "1380469",
@@ -3469,7 +3479,7 @@
       "Estado": "Diferencia +1,630,469.0"
     },
     {
-      "FechaCartola": "2026-04-16",
+      "FechaCartola": "2026-04-17",
       "Sociedad": "EL",
       "Ticker": "BCI",
       "CantCartola": "0",
@@ -3478,7 +3488,7 @@
       "Estado": "OK"
     },
     {
-      "FechaCartola": "2026-04-16",
+      "FechaCartola": "2026-04-17",
       "Sociedad": "EL",
       "Ticker": "CENCOSUD",
       "CantCartola": "86229",
@@ -3487,7 +3497,7 @@
       "Estado": "Diferencia +106,000.0"
     },
     {
-      "FechaCartola": "2026-04-16",
+      "FechaCartola": "2026-04-17",
       "Sociedad": "EL",
       "Ticker": "CFIARRAA-E",
       "CantCartola": "0",
@@ -3496,7 +3506,7 @@
       "Estado": "Solo en facturas"
     },
     {
-      "FechaCartola": "2026-04-16",
+      "FechaCartola": "2026-04-17",
       "Sociedad": "EL",
       "Ticker": "CFIMRCLP",
       "CantCartola": "0",
@@ -3505,7 +3515,7 @@
       "Estado": "Solo en facturas"
     },
     {
-      "FechaCartola": "2026-04-16",
+      "FechaCartola": "2026-04-17",
       "Sociedad": "EL",
       "Ticker": "CHILE",
       "CantCartola": "5000000",
@@ -3514,7 +3524,7 @@
       "Estado": "OK"
     },
     {
-      "FechaCartola": "2026-04-16",
+      "FechaCartola": "2026-04-17",
       "Sociedad": "EL",
       "Ticker": "COPEC",
       "CantCartola": "18769",
@@ -3523,16 +3533,16 @@
       "Estado": "Solo en cartola"
     },
     {
-      "FechaCartola": "2026-04-16",
+      "FechaCartola": "2026-04-17",
       "Sociedad": "EL",
       "Ticker": "ENELAM",
-      "CantCartola": "3016436",
+      "CantCartola": "3436332",
       "CantFacturas": "-1000000",
-      "Diferencia": "4016436",
-      "Estado": "Diferencia +4,016,436.0"
+      "Diferencia": "4436332",
+      "Estado": "Diferencia +4,436,332.0"
     },
     {
-      "FechaCartola": "2026-04-16",
+      "FechaCartola": "2026-04-17",
       "Sociedad": "EL",
       "Ticker": "ENELCHILE",
       "CantCartola": "0",
@@ -3541,7 +3551,7 @@
       "Estado": "OK"
     },
     {
-      "FechaCartola": "2026-04-16",
+      "FechaCartola": "2026-04-17",
       "Sociedad": "EL",
       "Ticker": "FALABELLA",
       "CantCartola": "0",
@@ -3550,7 +3560,7 @@
       "Estado": "OK"
     },
     {
-      "FechaCartola": "2026-04-16",
+      "FechaCartola": "2026-04-17",
       "Sociedad": "EL",
       "Ticker": "ITAUCL",
       "CantCartola": "3801",
@@ -3559,16 +3569,16 @@
       "Estado": "OK"
     },
     {
-      "FechaCartola": "2026-04-16",
+      "FechaCartola": "2026-04-17",
       "Sociedad": "EL",
       "Ticker": "LTM",
-      "CantCartola": "14770737",
+      "CantCartola": "26954228",
       "CantFacturas": "-32714826",
-      "Diferencia": "47485563",
-      "Estado": "Diferencia +47,485,563.0"
+      "Diferencia": "59669054",
+      "Estado": "Diferencia +59,669,054.0"
     },
     {
-      "FechaCartola": "2026-04-16",
+      "FechaCartola": "2026-04-17",
       "Sociedad": "EL",
       "Ticker": "MALLPLAZA",
       "CantCartola": "0",
@@ -3577,7 +3587,7 @@
       "Estado": "OK"
     },
     {
-      "FechaCartola": "2026-04-16",
+      "FechaCartola": "2026-04-17",
       "Sociedad": "EL",
       "Ticker": "SQM-B",
       "CantCartola": "0",
