@@ -1,4 +1,7 @@
 from datetime import date
+import json
+import os
+from datetime import datetime
 """
 Lógica de cálculo de cartera — generado automáticamente desde cartola BCI.
 Posiciones base: cartola 16/04/2026.
@@ -90,6 +93,15 @@ INSTRUMENTOS_META = {
 
 # Mapa de nombres por nemotécnico (para cuando el JSON no trae nombre)
 _NOMBRES = {m: v["nombre"] for m, v in INSTRUMENTOS_META.items()}
+CARTOLA_FILE = os.path.join(os.path.dirname(__file__), "cartola_data.json")
+_EL_ACCIONES_DEFAULT = EL_ACCIONES
+_EL_CFI_DEFAULT = EL_CFI
+_EL_SIM_DEFAULT = EL_SIM
+_EMF_CFI_DEFAULT = EMF_CFI
+_EMF_FWD_DEFAULT = EMF_FWD
+_CAJA_EL_DEFAULT = CAJA_EL
+_OPS_LIQUIDAR_DEFAULT = OPS_LIQUIDAR
+_CAJA_EMF_DEFAULT = CAJA_EMF
 
 
 # ── Carga de datos desde JSON ────────────────────────────────────────────────
