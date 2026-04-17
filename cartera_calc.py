@@ -1,3 +1,4 @@
+from datetime import date
 """
 Lógica de cálculo de cartera — generado automáticamente desde cartola BCI.
 Posiciones base: cartola 16/04/2026.
