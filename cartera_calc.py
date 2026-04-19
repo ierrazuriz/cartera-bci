@@ -7,7 +7,6 @@ Lógica de cálculo de cartera — generado automáticamente desde cartola BCI.
 Posiciones base: cartola 17/04/2026.
 NO editar manualmente — se sobreescribe con cada sync.
 """
-from datetime import date
 
 # ── EL LTDA (76.677.950-6) ─────────────────────────────────────────────────────
 # (nemotécnico, nombre, cant_activo, cant_pasivo, precio_cartola)
@@ -203,3 +202,24 @@ def calcular_emf(precios, hoy=None):
         "patrimonio_uf":   patrimonio / precios.get("UF",  39_841.72),
         "patrimonio_usd":  patrimonio / precios.get("USD",    927.46),
     }
+
+# -- Carga dinamica desde JSON --
+CARTOLA_FILE = os.path.join(os.path.dirname(__file__), "cartola_data.json")
+_NOMBRES = {m: v["nombre"] for m, v in INSTRUMENTOS_META.items()}
+_EL_ACCIONES_DEFAULT = EL_ACCIONES
+_EL_CFI_DEFAULT = EL_CFI
+_EL_SIM_DEFAULT = EL_SIM
+_EMF_CFI_DEFAULT = EMF_CFI
+_EMF_FWD_DEFAULT = EMF_FWD
+_CAJA_EL_DEFAULT = CAJA_EL
+_OPS_LIQUIDAR_DEFAULT = OPS_LIQUIDAR
+_CAJA_EMF_DEFAULT = CAJA_EMF
+
+
+def cargar_datos_cartola(path=None):
+    p = path or CARTOLA_FILE
+    try:
+        with open(p, encoding="utf-8") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+                    return None
