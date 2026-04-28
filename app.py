@@ -13,7 +13,7 @@ import os
 import json
 import logging
 import threading
-import requests as _requests
+import requests as _requestsh
 from datetime import date
 from flask import Flask, render_template, request, redirect, url_for, send_file, jsonify
 
@@ -110,8 +110,8 @@ def index():
 
     # FIX 2: cargar datos dinámicos desde cartola_data.json
     datos_cartola = cargar_datos_cartola()
-    el = calcular_el(precios, hoy, datos_cartola)
-    emf = calcular_emf(precios, hoy, datos_cartola)
+    el = calcular_el(precios, hoy)
+    emf = calcular_emf(precios, hoy)
     pat_total = el["patrimonio_clp"] + emf["patrimonio_clp"]
 
     # Fecha base de la cartola (para mostrar en el header)
@@ -290,8 +290,8 @@ def api_estado():
     precios = load_precios()
     hoy = date.today()
     datos_cartola = cargar_datos_cartola()
-    el = calcular_el(precios, hoy, datos_cartola)
-    emf = calcular_emf(precios, hoy, datos_cartola)
+    el = calcular_el(precios, hoy)
+    emf = calcular_emf(precios, hoy)
     return jsonify({
         "fecha": hoy.isoformat(),
         "precios": precios,
