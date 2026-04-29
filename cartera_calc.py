@@ -1,27 +1,28 @@
 """
 Lógica de cálculo de cartera — generado automáticamente desde cartola BCI.
-Posiciones base: cartola 28/04/2026.
+Posiciones base: cartola 29/04/2026.
 NO editar manualmente — se sobreescribe con cada sync.
 """
+from datetime import date
 
 # ── EL LTDA (76.677.950-6) ─────────────────────────────────────────────────────
 # (nemotécnico, nombre, cant_activo, cant_pasivo, precio_cartola)
 EL_ACCIONES = [
-    ("ABC", "Abc S.A.", 23_210_430, 0, 12.07),
-    ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 351.8),
-    ("CENCOSUD", "Cencosud S.A.", 86_229, 0, 2355.3),
-    ("CHILE", "Banco De Chile", 5_000_000, 0, 170.79),
-    ("COPEC", "Empresas Copec S.A.", 21_055, 0, 6600.0),
-    ("ENELAM", "Enel Americas S.A.", 10_158_102, 0, 85.2),
-    ("ITAUCL", "Banco Itau Chile", 3_801, 0, 19350.0),
-    ("LTM", "Latam Airlines Group S.A.", 77_285_174, 0, 22.05),
-    ("SQM-B", "Sociedad Quimica Y Minera De Chile S.A.", 7_825, 0, 81200.0),
+    ("ABC", "Abc S.A.", 23_210_430, 0, 12.26),
+    ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 347.0),
+    ("CENCOSUD", "Cencosud S.A.", 86_229, 0, 2278.0),
+    ("CHILE", "Banco De Chile", 5_000_000, 0, 168.25),
+    ("COPEC", "Empresas Copec S.A.", 21_055, 0, 6515.0),
+    ("ENELAM", "Enel Americas S.A.", 10_158_102, 0, 83.92),
+    ("ITAUCL", "Banco Itau Chile", 3_801, 0, 19000.0),
+    ("LTM", "Latam Airlines Group S.A.", 77_285_174, 0, 21.62),
+    ("SQM-B", "Sociedad Quimica Y Minera De Chile S.A.", 5_553, 0, 79302.0),
 ]
 
 # (nemotécnico, nombre, cantidad, precio_compra, precio_cartola)
 EL_CFI = [
-    ("CFIARRAA-E", "Cfiarraa-E", 4_187, 48138.424, 56480.85),
-    ("CFIMRCLP", "Moneda Renta Clp Fi, Serie A", 11_172, 19592.0, 20100.0),
+    ("CFIARRAA-E", "Cfiarraa-E", 4_187, 48138.424, 56498.5811),
+    ("CFIMRCLP", "Moneda Renta Clp Fi, Serie A", 11_172, 19592.0, 20019.16),
     ("CFITRIPT-E", "Cfitript-E", 1_471, 13280.761, 12000.0),
 ]
 
@@ -40,7 +41,7 @@ EL_SIM = [
 
 # ── EMF SPA (77.209.686-0) ──────────────────────────────────────────────────────
 EMF_CFI = [
-    ("CFIARRAA-E", "Cfiarraa-E", 500, 47154.0, 56480.85),
+    ("CFIARRAA-E", "Cfiarraa-E", 500, 47154.0, 56498.5811),
 ]
 
 # (folio, tipo C/V, usd, tc_fwd, f_inicio, f_termino)
@@ -53,28 +54,28 @@ EMF_FWD = [
     (1834324, "V", 500_000, 922.32, date(2026,4,2), date(2026,5,5)),
 ]
 
-# Cajas (saldo cartola 28/04/2026)
+# Cajas (saldo cartola 29/04/2026)
 CAJA_EL       = 1_131_573
-OPS_LIQUIDAR  = 18_686_168
+OPS_LIQUIDAR  = 640_324_462
 CAJA_EMF      = 73_351_120
 
-# Precios base (cartola 28/04/2026)
+# Precios base (cartola 29/04/2026)
 PRECIOS_DEFAULT = {
-    "UF": 40093.59,
-    "USD": 894.18,
-    "EUR": 1048.15,
-    "ABC": 12.07,
-    "AGUAS-A": 351.8,
-    "CENCOSUD": 2355.3,
-    "CFIARRAA-E": 56480.85,
-    "CFIMRCLP": 20100.0,
+    "UF": 40106.89,
+    "USD": 896.03,
+    "EUR": 1049.58,
+    "ABC": 12.26,
+    "AGUAS-A": 347.0,
+    "CENCOSUD": 2278.0,
+    "CFIARRAA-E": 56498.5811,
+    "CFIMRCLP": 20019.16,
     "CFITRIPT-E": 12000.0,
-    "CHILE": 170.79,
-    "COPEC": 6600.0,
-    "ENELAM": 85.2,
-    "ITAUCL": 19350.0,
-    "LTM": 22.05,
-    "SQM-B": 81200.0,
+    "CHILE": 168.25,
+    "COPEC": 6515.0,
+    "ENELAM": 83.92,
+    "ITAUCL": 19000.0,
+    "LTM": 21.62,
+    "SQM-B": 79302.0,
 }
 
 INSTRUMENTOS_META = {
@@ -205,24 +206,3 @@ def calcular_emf(precios, hoy=None):
         "patrimonio_uf":   patrimonio / precios.get("UF",  39_841.72),
         "patrimonio_usd":  patrimonio / precios.get("USD",    927.46),
     }
-
-# -- Carga dinamica desde JSON --
-CARTOLA_FILE = os.path.join(os.path.dirname(__file__), "cartola_data.json")
-_NOMBRES = {m: v["nombre"] for m, v in INSTRUMENTOS_META.items()}
-_EL_ACCIONES_DEFAULT = EL_ACCIONES
-_EL_CFI_DEFAULT = EL_CFI
-_EL_SIM_DEFAULT = EL_SIM
-_EMF_CFI_DEFAULT = EMF_CFI
-_EMF_FWD_DEFAULT = EMF_FWD
-_CAJA_EL_DEFAULT = CAJA_EL
-_OPS_LIQUIDAR_DEFAULT = OPS_LIQUIDAR
-_CAJA_EMF_DEFAULT = CAJA_EMF
-
-
-def cargar_datos_cartola(path=None):
-    p = path or CARTOLA_FILE
-    try:
-        with open(p, encoding="utf-8") as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-                    return None
