@@ -206,3 +206,15 @@ def calcular_emf(precios, hoy=None):
         "patrimonio_uf":   patrimonio / precios.get("UF",  39_841.72),
         "patrimonio_usd":  patrimonio / precios.get("USD",    927.46),
     }
+
+
+def cargar_datos_cartola(path=None):
+    """Lee cartola_data.json y retorna el dict, o None si no existe."""
+    import os, json
+    if path is None:
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cartola_data.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return None
