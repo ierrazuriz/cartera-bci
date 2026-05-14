@@ -3,9 +3,29 @@ Lógica de cálculo de cartera — generado automáticamente desde cartola BCI.
 Posiciones base: cartola 14/05/2026.
 NO editar manualmente — se sobreescribe con cada sync.
 """
-from datetime import date
+import os
+import json
+from datetime import date, datetime
 
-# ── EL LTDA (76.677.950-6) ─────────────────────────────────────────────────────
+
+def _cargar_json():
+    """Lee cartola_data.json y retorna el dict, o None si no existe."""
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cartola_data.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return None
+
+
+def _to_date(s):
+    """Convierte string ISO '2026-04-30' a date object."""
+    if isinstance(s, date):
+        return s
+    return datetime.strptime(s, "%Y-%m-%d").date()
+
+
+# ── Constantes fallback (cartola 29/04/2026) ────────────────────────────────
 # (nemotécnico, nombre, cant_activo, cant_pasivo, precio_cartola)
 EL_ACCIONES = [
     ("ABC", "Abc S.A.", 23_210_430, 0, 11.22),
@@ -87,9 +107,49 @@ def calcular_el(precios, hoy=None):
     if hoy is None:
         hoy = date.today()
 
+    # ── Leer posiciones desde cartola_data.json si está disponible ──────────
+    data = _cargar_json()
+    el = data.get("el", {}) if data else {}
+
+    # Acciones
+    if el.get("acciones"):
+        acciones_raw = [
+            (a["nem"], INSTRUMENTOS_META.get(a["nem"], {}).get("nombre", a["nem"]),
+             a["cant_activo"], a["cant_pasivo"], a["precio_cartola"])
+            for a in el["acciones"]
+        ]
+    else:
+        acciones_raw = EL_ACCIONES
+
+    # CFIs EL
+    if el.get("cfis"):
+        cfis_raw = [
+            (c["nem"], INSTRUMENTOS_META.get(c["nem"], {}).get("nombre", c["nem"]),
+             c["cantidad"], c["precio_compra"], c["precio_cartola"])
+            for c in el["cfis"]
+        ]
+    else:
+        cfis_raw = EL_CFI
+
+    # SIMs
+    if el.get("sims"):
+        sims_raw = [
+            (s["instrumento"], s["cantidad"],
+             _to_date(s["f_venta"]), s["monto_venta"],
+             _to_date(s["f_compra"]), s["monto_compra"])
+            for s in el["sims"]
+        ]
+    else:
+        sims_raw = EL_SIM
+
+    # Caja y ops_liquidar
+    caja_el = el.get("caja", CAJA_EL)
+    ops_liquidar = el.get("ops_liquidar", OPS_LIQUIDAR)
+
+    # ── Calcular ─────────────────────────────────────────────────────────────
     acciones = []
-    for nem, nombre, cant_a, cant_p, p_c in EL_ACCIONES:
-        p  = precios.get(nem, p_c)
+    for nem, nombre, cant_a, cant_p, p_c in acciones_raw:
+        p = precios.get(nem, p_c)
         va = cant_a * p
         vp = cant_p * p
         acciones.append({
@@ -102,7 +162,7 @@ def calcular_el(precios, hoy=None):
         })
 
     cfis = []
-    for nem, nombre, cant, p_comp, p_cart in EL_CFI:
+    for nem, nombre, cant, p_comp, p_cart in cfis_raw:
         p = precios.get(nem, p_cart)
         cfis.append({
             "nem": nem, "nombre": nombre, "cantidad": cant,
@@ -112,11 +172,11 @@ def calcular_el(precios, hoy=None):
         })
 
     sims = []
-    for inst, cant, f_vta, m_vta, f_cpra, m_cpra in EL_SIM:
+    for inst, cant, f_vta, m_vta, f_cpra, m_cpra in sims_raw:
         total_days = (f_cpra - f_vta).days
-        elapsed    = max(0, min((hoy - f_vta).days, total_days))
-        amort      = m_vta + (m_cpra - m_vta) * elapsed / total_days if total_days else m_cpra
-        p  = precios.get(inst, 0)
+        elapsed = max(0, min((hoy - f_vta).days, total_days))
+        amort = m_vta + (m_cpra - m_vta) * elapsed / total_days if total_days else m_cpra
+        p = precios.get(inst, 0)
         vm = cant * p
         sims.append({
             "instrumento": inst, "cantidad": cant,
@@ -128,25 +188,25 @@ def calcular_el(precios, hoy=None):
             "vencida": hoy >= f_cpra,
         })
 
-    tot_acc_neto  = sum(a["valor_neto"]    for a in acciones)
-    tot_cfi       = sum(c["valor_mercado"] for c in cfis)
+    tot_acc_neto = sum(a["valor_neto"] for a in acciones)
+    tot_cfi = sum(c["valor_mercado"] for c in cfis)
     tot_sim_amort = sum(s["monto_amortizado"] for s in sims)
 
-    patrimonio = CAJA_EL + OPS_LIQUIDAR + tot_acc_neto + tot_cfi - tot_sim_amort
+    patrimonio = caja_el + ops_liquidar + tot_acc_neto + tot_cfi - tot_sim_amort
     return {
         "acciones": acciones, "cfis": cfis, "sims": sims,
-        "tot_acc_activo":  sum(a["valor_activo"]  for a in acciones),
-        "tot_acc_pasivo":  sum(a["valor_pasivo"]  for a in acciones),
-        "tot_acc_neto":    tot_acc_neto,
-        "tot_cfi":         tot_cfi,
-        "tot_sim_amort":   tot_sim_amort,
-        "tot_sim_vm":      sum(s["valor_mercado"] for s in sims),
-        "tot_sim_resultado": sum(s["resultado"]   for s in sims),
-        "caja":            CAJA_EL,
-        "ops_liquidar":    OPS_LIQUIDAR,
-        "patrimonio_clp":  patrimonio,
-        "patrimonio_uf":   patrimonio / precios.get("UF",  39_841.72),
-        "patrimonio_usd":  patrimonio / precios.get("USD",    927.46),
+        "tot_acc_activo": sum(a["valor_activo"] for a in acciones),
+        "tot_acc_pasivo": sum(a["valor_pasivo"] for a in acciones),
+        "tot_acc_neto": tot_acc_neto,
+        "tot_cfi": tot_cfi,
+        "tot_sim_amort": tot_sim_amort,
+        "tot_sim_vm": sum(s["valor_mercado"] for s in sims),
+        "tot_sim_resultado": sum(s["resultado"] for s in sims),
+        "caja": caja_el,
+        "ops_liquidar": ops_liquidar,
+        "patrimonio_clp": patrimonio,
+        "patrimonio_uf": patrimonio / precios.get("UF", 39_841.72),
+        "patrimonio_usd": patrimonio / precios.get("USD", 927.46),
     }
 
 
@@ -154,8 +214,36 @@ def calcular_emf(precios, hoy=None):
     if hoy is None:
         hoy = date.today()
 
+    # ── Leer posiciones desde cartola_data.json si está disponible ──────────
+    data = _cargar_json()
+    emf = data.get("emf", {}) if data else {}
+
+    # CFIs EMF
+    if emf.get("cfis"):
+        cfis_raw = [
+            (c["nem"], INSTRUMENTOS_META.get(c["nem"], {}).get("nombre", c["nem"]),
+             c["cantidad"], c["precio_compra"], c["precio_cartola"])
+            for c in emf["cfis"]
+        ]
+    else:
+        cfis_raw = EMF_CFI
+
+    # Forwards
+    if emf.get("fwds"):
+        fwds_raw = [
+            (f["folio"], f["tipo"], f["usd"], f["tc_fwd"],
+             _to_date(f["f_inicio"]), _to_date(f["f_termino"]))
+            for f in emf["fwds"]
+        ]
+    else:
+        fwds_raw = EMF_FWD
+
+    # Caja
+    caja_emf = emf.get("caja", CAJA_EMF)
+
+    # ── Calcular ─────────────────────────────────────────────────────────────
     cfis = []
-    for nem, nombre, cant, p_comp, p_cart in EMF_CFI:
+    for nem, nombre, cant, p_comp, p_cart in cfis_raw:
         p = precios.get(nem, p_cart)
         cfis.append({
             "nem": nem, "nombre": nombre, "cantidad": cant,
@@ -167,7 +255,7 @@ def calcular_emf(precios, hoy=None):
     spot = precios.get("USD", 927.46)
     fwds = []
     compra_usd = venta_usd = 0
-    for folio, tipo, usd, tc_fwd, f_ini, f_term in EMF_FWD:
+    for folio, tipo, usd, tc_fwd, f_ini, f_term in fwds_raw:
         resultado = (spot - tc_fwd) * usd if tipo == "C" else (tc_fwd - spot) * usd
         if tipo == "C":
             compra_usd += usd
@@ -182,16 +270,28 @@ def calcular_emf(precios, hoy=None):
         })
 
     tot_cfi = sum(c["valor_mercado"] for c in cfis)
-    tot_fwd = sum(f["resultado"]     for f in fwds)
+    tot_fwd = sum(f["resultado"] for f in fwds)
 
-    patrimonio = CAJA_EMF + tot_cfi
+    patrimonio = caja_emf + tot_cfi
     return {
         "cfis": cfis, "fwds": fwds,
         "tot_cfi": tot_cfi, "tot_fwd": tot_fwd,
         "compra_usd": compra_usd, "venta_usd": venta_usd,
         "descalce_usd": compra_usd - venta_usd,
-        "caja": CAJA_EMF,
-        "patrimonio_clp":  patrimonio,
-        "patrimonio_uf":   patrimonio / precios.get("UF",  39_841.72),
-        "patrimonio_usd":  patrimonio / precios.get("USD",    927.46),
+        "caja": caja_emf,
+        "patrimonio_clp": patrimonio,
+        "patrimonio_uf": patrimonio / precios.get("UF", 39_841.72),
+        "patrimonio_usd": patrimonio / precios.get("USD", 927.46),
     }
+
+
+def cargar_datos_cartola(path=None):
+    """Lee cartola_data.json y retorna el dict, o None si no existe."""
+    import os, json
+    if path is None:
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cartola_data.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return None
