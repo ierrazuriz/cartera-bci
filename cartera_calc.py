@@ -1,46 +1,27 @@
 """
 Lógica de cálculo de cartera — generado automáticamente desde cartola BCI.
-Posiciones base: cartola 14/05/2026.
+Posiciones base: cartola 19/05/2026.
 NO editar manualmente — se sobreescribe con cada sync.
 """
-import os
-import json
-from datetime import date, datetime
+from datetime import date
 
-
-def _cargar_json():
-    """Lee cartola_data.json y retorna el dict, o None si no existe."""
-    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cartola_data.json")
-    try:
-        with open(path, encoding="utf-8") as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return None
-
-
-def _to_date(s):
-    """Convierte string ISO '2026-04-30' a date object."""
-    if isinstance(s, date):
-        return s
-    return datetime.strptime(s, "%Y-%m-%d").date()
-
-
-# ── Constantes fallback (cartola 29/04/2026) ────────────────────────────────
+# ── EL LTDA (76.677.950-6) ─────────────────────────────────────────────────────
 # (nemotécnico, nombre, cant_activo, cant_pasivo, precio_cartola)
 EL_ACCIONES = [
     ("ABC", "Abc S.A.", 23_210_430, 0, 11.22),
-    ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 328.0),
-    ("CENCOSUD", "Cencosud S.A.", 136_229, 0, 2082.0),
-    ("CHILE", "Banco De Chile", 5_126_593, 0, 155.2),
-    ("COPEC", "Empresas Copec S.A.", 21_055, 0, 6100.0),
-    ("ENELAM", "Enel Americas S.A.", 10_158_102, 0, 78.01),
-    ("ITAUCL", "Banco Itau Chile", 3_801, 0, 17122.0),
-    ("LTM", "Latam Airlines Group S.A.", 77_285_174, 0, 21.2),
+    ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 329.99),
+    ("BCI", "Banco De Credito E Inversiones", 339, 0, 59600.0),
+    ("CENCOSUD", "Cencosud S.A.", 136_229, 0, 2106.0),
+    ("CHILE", "Banco De Chile", 5_000_000, 0, 165.0),
+    ("COPEC", "Empresas Copec S.A.", 21_055, 0, 6450.0),
+    ("ENELAM", "Enel Americas S.A.", 10_158_102, 0, 76.0),
+    ("ITAUCL", "Banco Itau Chile", 3_801, 0, 16900.0),
+    ("LTM", "Latam Airlines Group S.A.", 77_285_174, 0, 21.35),
 ]
 
 # (nemotécnico, nombre, cantidad, precio_compra, precio_cartola)
 EL_CFI = [
-    ("CFIARRAA-E", "Cfiarraa-E", 4_187, 48138.424, 53224.18),
+    ("CFIARRAA-E", "Cfiarraa-E", 4_187, 48138.424, 54026.53),
     ("CFITRIPT-E", "Cfitript-E", 1_471, 13280.761, 14000.0),
 ]
 
@@ -48,17 +29,16 @@ EL_CFI = [
 EL_SIM = [
     ("AGUAS-A", 438_600, date(2026,4,23), 156_615_288, date(2026,5,25), 157_417_137),
     ("COPEC", 2_286, date(2026,4,23), 15_233_218, date(2026,5,25), 15_311_212),
-    ("ENELAM", 1_136_332, date(2026,4,17), 99_429_050, date(2026,5,15), 99_874_492),
     ("ENELAM", 7_905_720, date(2026,4,1), 640_284_263, date(2026,5,29), 646_226_202),
     ("ENELAM", 816_050, date(2026,5,11), 66_671_285, date(2026,6,10), 66_991_340),
-    ("LTM", 8_391_584, date(2026,4,17), 207_356_041, date(2026,5,15), 208_284_989),
+    ("ENELAM", 1_171_082, date(2026,5,15), 89_295_002, date(2026,6,15), 89_737_906),
     ("LTM", 5_296_810, date(2026,4,1), 125_004_716, date(2026,5,29), 126_164_717),
     ("LTM", 41_799_270, date(2026,5,11), 939_229_597, date(2026,6,10), 943_739_738),
 ]
 
 # ── EMF SPA (77.209.686-0) ──────────────────────────────────────────────────────
 EMF_CFI = [
-    ("CFIARRAA-E", "Cfiarraa-E", 500, 47154.0, 53224.18),
+    ("CFIARRAA-E", "Cfiarraa-E", 500, 47154.0, 54026.53),
 ]
 
 # (folio, tipo C/V, usd, tc_fwd, f_inicio, f_termino)
@@ -67,31 +47,33 @@ EMF_FWD = [
     (1840713, "V", 250_000, 889.53, date(2026,5,11), date(2026,6,5)),
 ]
 
-# Cajas (saldo cartola 14/05/2026)
-CAJA_EL       = 17
-OPS_LIQUIDAR  = 218_865_023
-CAJA_EMF      = 91_933_620
+# Cajas (saldo cartola 19/05/2026)
+CAJA_EL       = 489_425_769
+OPS_LIQUIDAR  = -2_885_955
+CAJA_EMF      = 105_733_620
 
-# Precios base (cartola 14/05/2026)
+# Precios base (cartola 19/05/2026)
 PRECIOS_DEFAULT = {
-    "UF": 40324.06,
-    "USD": 889.19,
-    "EUR": 1040.96,
+    "UF": 40408.15,
+    "USD": 901.59,
+    "EUR": 1049.58,
     "ABC": 11.22,
-    "AGUAS-A": 328.0,
-    "CENCOSUD": 2082.0,
-    "CFIARRAA-E": 53224.18,
+    "AGUAS-A": 329.99,
+    "BCI": 59600.0,
+    "CENCOSUD": 2106.0,
+    "CFIARRAA-E": 54026.53,
     "CFITRIPT-E": 14000.0,
-    "CHILE": 155.2,
-    "COPEC": 6100.0,
-    "ENELAM": 78.01,
-    "ITAUCL": 17122.0,
-    "LTM": 21.2,
+    "CHILE": 165.0,
+    "COPEC": 6450.0,
+    "ENELAM": 76.0,
+    "ITAUCL": 16900.0,
+    "LTM": 21.35,
 }
 
 INSTRUMENTOS_META = {
     "ABC": {"nombre": "Abc S.A.", "tipo": "accion", "fmt": ".4f"},
     "AGUAS-A": {"nombre": "Aguas Andinas S.A.", "tipo": "accion", "fmt": ".4f"},
+    "BCI": {"nombre": "Banco De Credito E Inversiones", "tipo": "accion", "fmt": ".4f"},
     "CENCOSUD": {"nombre": "Cencosud S.A.", "tipo": "accion", "fmt": ".4f"},
     "CHILE": {"nombre": "Banco De Chile", "tipo": "accion", "fmt": ".4f"},
     "COPEC": {"nombre": "Empresas Copec S.A.", "tipo": "accion", "fmt": ".4f"},
@@ -107,49 +89,9 @@ def calcular_el(precios, hoy=None):
     if hoy is None:
         hoy = date.today()
 
-    # ── Leer posiciones desde cartola_data.json si está disponible ──────────
-    data = _cargar_json()
-    el = data.get("el", {}) if data else {}
-
-    # Acciones
-    if el.get("acciones"):
-        acciones_raw = [
-            (a["nem"], INSTRUMENTOS_META.get(a["nem"], {}).get("nombre", a["nem"]),
-             a["cant_activo"], a["cant_pasivo"], a["precio_cartola"])
-            for a in el["acciones"]
-        ]
-    else:
-        acciones_raw = EL_ACCIONES
-
-    # CFIs EL
-    if el.get("cfis"):
-        cfis_raw = [
-            (c["nem"], INSTRUMENTOS_META.get(c["nem"], {}).get("nombre", c["nem"]),
-             c["cantidad"], c["precio_compra"], c["precio_cartola"])
-            for c in el["cfis"]
-        ]
-    else:
-        cfis_raw = EL_CFI
-
-    # SIMs
-    if el.get("sims"):
-        sims_raw = [
-            (s["instrumento"], s["cantidad"],
-             _to_date(s["f_venta"]), s["monto_venta"],
-             _to_date(s["f_compra"]), s["monto_compra"])
-            for s in el["sims"]
-        ]
-    else:
-        sims_raw = EL_SIM
-
-    # Caja y ops_liquidar
-    caja_el = el.get("caja", CAJA_EL)
-    ops_liquidar = el.get("ops_liquidar", OPS_LIQUIDAR)
-
-    # ── Calcular ─────────────────────────────────────────────────────────────
     acciones = []
-    for nem, nombre, cant_a, cant_p, p_c in acciones_raw:
-        p = precios.get(nem, p_c)
+    for nem, nombre, cant_a, cant_p, p_c in EL_ACCIONES:
+        p  = precios.get(nem, p_c)
         va = cant_a * p
         vp = cant_p * p
         acciones.append({
@@ -162,7 +104,7 @@ def calcular_el(precios, hoy=None):
         })
 
     cfis = []
-    for nem, nombre, cant, p_comp, p_cart in cfis_raw:
+    for nem, nombre, cant, p_comp, p_cart in EL_CFI:
         p = precios.get(nem, p_cart)
         cfis.append({
             "nem": nem, "nombre": nombre, "cantidad": cant,
@@ -172,11 +114,11 @@ def calcular_el(precios, hoy=None):
         })
 
     sims = []
-    for inst, cant, f_vta, m_vta, f_cpra, m_cpra in sims_raw:
+    for inst, cant, f_vta, m_vta, f_cpra, m_cpra in EL_SIM:
         total_days = (f_cpra - f_vta).days
-        elapsed = max(0, min((hoy - f_vta).days, total_days))
-        amort = m_vta + (m_cpra - m_vta) * elapsed / total_days if total_days else m_cpra
-        p = precios.get(inst, 0)
+        elapsed    = max(0, min((hoy - f_vta).days, total_days))
+        amort      = m_vta + (m_cpra - m_vta) * elapsed / total_days if total_days else m_cpra
+        p  = precios.get(inst, 0)
         vm = cant * p
         sims.append({
             "instrumento": inst, "cantidad": cant,
@@ -188,25 +130,25 @@ def calcular_el(precios, hoy=None):
             "vencida": hoy >= f_cpra,
         })
 
-    tot_acc_neto = sum(a["valor_neto"] for a in acciones)
-    tot_cfi = sum(c["valor_mercado"] for c in cfis)
+    tot_acc_neto  = sum(a["valor_neto"]    for a in acciones)
+    tot_cfi       = sum(c["valor_mercado"] for c in cfis)
     tot_sim_amort = sum(s["monto_amortizado"] for s in sims)
 
-    patrimonio = caja_el + ops_liquidar + tot_acc_neto + tot_cfi - tot_sim_amort
+    patrimonio = CAJA_EL + OPS_LIQUIDAR + tot_acc_neto + tot_cfi - tot_sim_amort
     return {
         "acciones": acciones, "cfis": cfis, "sims": sims,
-        "tot_acc_activo": sum(a["valor_activo"] for a in acciones),
-        "tot_acc_pasivo": sum(a["valor_pasivo"] for a in acciones),
-        "tot_acc_neto": tot_acc_neto,
-        "tot_cfi": tot_cfi,
-        "tot_sim_amort": tot_sim_amort,
-        "tot_sim_vm": sum(s["valor_mercado"] for s in sims),
-        "tot_sim_resultado": sum(s["resultado"] for s in sims),
-        "caja": caja_el,
-        "ops_liquidar": ops_liquidar,
-        "patrimonio_clp": patrimonio,
-        "patrimonio_uf": patrimonio / precios.get("UF", 39_841.72),
-        "patrimonio_usd": patrimonio / precios.get("USD", 927.46),
+        "tot_acc_activo":  sum(a["valor_activo"]  for a in acciones),
+        "tot_acc_pasivo":  sum(a["valor_pasivo"]  for a in acciones),
+        "tot_acc_neto":    tot_acc_neto,
+        "tot_cfi":         tot_cfi,
+        "tot_sim_amort":   tot_sim_amort,
+        "tot_sim_vm":      sum(s["valor_mercado"] for s in sims),
+        "tot_sim_resultado": sum(s["resultado"]   for s in sims),
+        "caja":            CAJA_EL,
+        "ops_liquidar":    OPS_LIQUIDAR,
+        "patrimonio_clp":  patrimonio,
+        "patrimonio_uf":   patrimonio / precios.get("UF",  39_841.72),
+        "patrimonio_usd":  patrimonio / precios.get("USD",    927.46),
     }
 
 
@@ -214,36 +156,8 @@ def calcular_emf(precios, hoy=None):
     if hoy is None:
         hoy = date.today()
 
-    # ── Leer posiciones desde cartola_data.json si está disponible ──────────
-    data = _cargar_json()
-    emf = data.get("emf", {}) if data else {}
-
-    # CFIs EMF
-    if emf.get("cfis"):
-        cfis_raw = [
-            (c["nem"], INSTRUMENTOS_META.get(c["nem"], {}).get("nombre", c["nem"]),
-             c["cantidad"], c["precio_compra"], c["precio_cartola"])
-            for c in emf["cfis"]
-        ]
-    else:
-        cfis_raw = EMF_CFI
-
-    # Forwards
-    if emf.get("fwds"):
-        fwds_raw = [
-            (f["folio"], f["tipo"], f["usd"], f["tc_fwd"],
-             _to_date(f["f_inicio"]), _to_date(f["f_termino"]))
-            for f in emf["fwds"]
-        ]
-    else:
-        fwds_raw = EMF_FWD
-
-    # Caja
-    caja_emf = emf.get("caja", CAJA_EMF)
-
-    # ── Calcular ─────────────────────────────────────────────────────────────
     cfis = []
-    for nem, nombre, cant, p_comp, p_cart in cfis_raw:
+    for nem, nombre, cant, p_comp, p_cart in EMF_CFI:
         p = precios.get(nem, p_cart)
         cfis.append({
             "nem": nem, "nombre": nombre, "cantidad": cant,
@@ -255,7 +169,7 @@ def calcular_emf(precios, hoy=None):
     spot = precios.get("USD", 927.46)
     fwds = []
     compra_usd = venta_usd = 0
-    for folio, tipo, usd, tc_fwd, f_ini, f_term in fwds_raw:
+    for folio, tipo, usd, tc_fwd, f_ini, f_term in EMF_FWD:
         resultado = (spot - tc_fwd) * usd if tipo == "C" else (tc_fwd - spot) * usd
         if tipo == "C":
             compra_usd += usd
@@ -270,28 +184,16 @@ def calcular_emf(precios, hoy=None):
         })
 
     tot_cfi = sum(c["valor_mercado"] for c in cfis)
-    tot_fwd = sum(f["resultado"] for f in fwds)
+    tot_fwd = sum(f["resultado"]     for f in fwds)
 
-    patrimonio = caja_emf + tot_cfi
+    patrimonio = CAJA_EMF + tot_cfi
     return {
         "cfis": cfis, "fwds": fwds,
         "tot_cfi": tot_cfi, "tot_fwd": tot_fwd,
         "compra_usd": compra_usd, "venta_usd": venta_usd,
         "descalce_usd": compra_usd - venta_usd,
-        "caja": caja_emf,
-        "patrimonio_clp": patrimonio,
-        "patrimonio_uf": patrimonio / precios.get("UF", 39_841.72),
-        "patrimonio_usd": patrimonio / precios.get("USD", 927.46),
+        "caja": CAJA_EMF,
+        "patrimonio_clp":  patrimonio,
+        "patrimonio_uf":   patrimonio / precios.get("UF",  39_841.72),
+        "patrimonio_usd":  patrimonio / precios.get("USD",    927.46),
     }
-
-
-def cargar_datos_cartola(path=None):
-    """Lee cartola_data.json y retorna el dict, o None si no existe."""
-    import os, json
-    if path is None:
-        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cartola_data.json")
-    try:
-        with open(path, encoding="utf-8") as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return None

@@ -1,5 +1,5 @@
 {
-  "sync_at": "2026-05-14T09:16:04.012564",
+  "sync_at": "2026-05-19T09:15:36.346298",
   "movimientos": [
     {
       "Fecha": "2026-04-01",
@@ -1190,6 +1190,91 @@
       "IVA": "",
       "Total": "",
       "ValorPagar": "241629786"
+    },
+    {
+      "Fecha": "2026-05-18",
+      "FechaPago": "2026-05-20",
+      "N°Factura": "3904579",
+      "Sociedad": "EL",
+      "Ticker": "BCI",
+      "Tipo": "COMPRA",
+      "TipoActivo": "Acciones Nacionales",
+      "APB": "Sí",
+      "PrecioUnit": "58713.522124",
+      "Cantidad": "339",
+      "Monto": "19903884",
+      "Comision": "5972",
+      "IVA": "1135",
+      "Total": "7107",
+      "ValorPagar": "19910991"
+    },
+    {
+      "Fecha": "2026-05-15",
+      "FechaPago": "2026-05-19",
+      "N°Factura": "3903800",
+      "Sociedad": "",
+      "Ticker": "BCI",
+      "Tipo": "VENTA",
+      "TipoActivo": "OE Acciones Nacionales",
+      "APB": "Sí",
+      "PrecioUnit": "58265",
+      "Cantidad": "2500",
+      "Monto": "145662500",
+      "Comision": "43700",
+      "IVA": "8303",
+      "Total": "52003",
+      "ValorPagar": ""
+    },
+    {
+      "Fecha": "2026-05-15",
+      "FechaPago": "2026-05-19",
+      "N°Factura": "3903801",
+      "Sociedad": "EL",
+      "Ticker": "CHILE",
+      "Tipo": "VENTA",
+      "TipoActivo": "Acciones Nacionales",
+      "APB": "Sí",
+      "PrecioUnit": "163.2",
+      "Cantidad": "3000000",
+      "Monto": "489600001",
+      "Comision": "146879",
+      "IVA": "27907",
+      "Total": "174786",
+      "ValorPagar": ""
+    },
+    {
+      "Fecha": "2026-05-14",
+      "FechaPago": "2026-05-18",
+      "N°Factura": "3903032",
+      "Sociedad": "",
+      "Ticker": "CHILE",
+      "Tipo": "VENTA",
+      "TipoActivo": "Acciones Nacionales",
+      "APB": "Sí",
+      "PrecioUnit": "162.74",
+      "Cantidad": "2000000",
+      "Monto": "325479999",
+      "Comision": "97646",
+      "IVA": "18553",
+      "Total": "116199",
+      "ValorPagar": ""
+    },
+    {
+      "Fecha": "2026-05-14",
+      "FechaPago": "2026-05-18",
+      "N°Factura": "3902805",
+      "Sociedad": "",
+      "Ticker": "CHILE",
+      "Tipo": "VENTA",
+      "TipoActivo": "OE Acciones Nacionales",
+      "APB": "Sí",
+      "PrecioUnit": "162.5",
+      "Cantidad": "2000000",
+      "Monto": "325000000",
+      "Comision": "97500",
+      "IVA": "18525",
+      "Total": "116025",
+      "ValorPagar": ""
     }
   ],
   "dividendos": [
@@ -1432,6 +1517,16 @@
       "NroAcciones": "136229",
       "ValorDivAccion": "25",
       "MontoTotal": "3405725"
+    },
+    {
+      "Fecha": "18 May 202",
+      "FechaPago": "2026-05-20",
+      "Sociedad": "EL",
+      "Instrumento": "ENELAM",
+      "Moneda": "CLP",
+      "NroAcciones": "10158102",
+      "ValorDivAccion": "1.6760055",
+      "MontoTotal": "17025035"
     }
   ],
   "transferencias": [],
@@ -4034,16 +4129,16 @@
   ],
   "comparacion": [
     {
-      "FechaCartola": "2026-05-14",
+      "FechaCartola": "2026-05-19",
       "Sociedad": "14.534.289-9",
       "Ticker": "BCI",
-      "CantCartola": "5000",
+      "CantCartola": "2500",
       "CantFacturas": "0",
-      "Diferencia": "5000",
+      "Diferencia": "2500",
       "Estado": "Solo en cartola"
     },
     {
-      "FechaCartola": "2026-05-14",
+      "FechaCartola": "2026-05-19",
       "Sociedad": "14.534.289-9",
       "Ticker": "BSANTANDER",
       "CantCartola": "12000000",
@@ -4052,16 +4147,16 @@
       "Estado": "Solo en cartola"
     },
     {
-      "FechaCartola": "2026-05-14",
+      "FechaCartola": "2026-05-19",
       "Sociedad": "14.534.289-9",
       "Ticker": "CHILE",
-      "CantCartola": "11619951",
+      "CantCartola": "7619951",
       "CantFacturas": "0",
-      "Diferencia": "11619951",
+      "Diferencia": "7619951",
       "Estado": "Solo en cartola"
     },
     {
-      "FechaCartola": "2026-05-14",
+      "FechaCartola": "2026-05-19",
       "Sociedad": "14.534.289-9",
       "Ticker": "LTM",
       "CantCartola": "10000000",
@@ -4070,7 +4165,7 @@
       "Estado": "Solo en cartola"
     },
     {
-      "FechaCartola": "2026-05-14",
+      "FechaCartola": "2026-05-19",
       "Sociedad": "EL",
       "Ticker": "ABC",
       "CantCartola": "23210430",
@@ -4079,7 +4174,7 @@
       "Estado": "Solo en cartola"
     },
     {
-      "FechaCartola": "2026-05-14",
+      "FechaCartola": "2026-05-19",
       "Sociedad": "EL",
       "Ticker": "AGUAS-A",
       "CantCartola": "1380469",
@@ -4088,16 +4183,16 @@
       "Estado": "Diferencia +1,630,469.0"
     },
     {
-      "FechaCartola": "2026-05-14",
+      "FechaCartola": "2026-05-19",
       "Sociedad": "EL",
       "Ticker": "BCI",
-      "CantCartola": "0",
-      "CantFacturas": "0",
+      "CantCartola": "339",
+      "CantFacturas": "339",
       "Diferencia": "0",
       "Estado": "OK"
     },
     {
-      "FechaCartola": "2026-05-14",
+      "FechaCartola": "2026-05-19",
       "Sociedad": "EL",
       "Ticker": "CENCOSUD",
       "CantCartola": "136229",
@@ -4106,7 +4201,7 @@
       "Estado": "Diferencia +106,000.0"
     },
     {
-      "FechaCartola": "2026-05-14",
+      "FechaCartola": "2026-05-19",
       "Sociedad": "EL",
       "Ticker": "CFIARRAA-E",
       "CantCartola": "0",
@@ -4115,7 +4210,7 @@
       "Estado": "Solo en facturas"
     },
     {
-      "FechaCartola": "2026-05-14",
+      "FechaCartola": "2026-05-19",
       "Sociedad": "EL",
       "Ticker": "CFIMRCLP",
       "CantCartola": "0",
@@ -4124,16 +4219,16 @@
       "Estado": "Solo en facturas"
     },
     {
-      "FechaCartola": "2026-05-14",
+      "FechaCartola": "2026-05-19",
       "Sociedad": "EL",
       "Ticker": "CHILE",
-      "CantCartola": "5126593",
-      "CantFacturas": "5126593",
-      "Diferencia": "0",
-      "Estado": "OK"
+      "CantCartola": "5000000",
+      "CantFacturas": "2126593",
+      "Diferencia": "2873407",
+      "Estado": "Diferencia +2,873,407.0"
     },
     {
-      "FechaCartola": "2026-05-14",
+      "FechaCartola": "2026-05-19",
       "Sociedad": "EL",
       "Ticker": "COPEC",
       "CantCartola": "18769",
@@ -4142,16 +4237,16 @@
       "Estado": "Solo en cartola"
     },
     {
-      "FechaCartola": "2026-05-14",
+      "FechaCartola": "2026-05-19",
       "Sociedad": "EL",
       "Ticker": "ENELAM",
-      "CantCartola": "300000",
+      "CantCartola": "265250",
       "CantFacturas": "-3000000",
-      "Diferencia": "3300000",
-      "Estado": "Diferencia +3,300,000.0"
+      "Diferencia": "3265250",
+      "Estado": "Diferencia +3,265,250.0"
     },
     {
-      "FechaCartola": "2026-05-14",
+      "FechaCartola": "2026-05-19",
       "Sociedad": "EL",
       "Ticker": "ENELCHILE",
       "CantCartola": "0",
@@ -4160,7 +4255,7 @@
       "Estado": "OK"
     },
     {
-      "FechaCartola": "2026-05-14",
+      "FechaCartola": "2026-05-19",
       "Sociedad": "EL",
       "Ticker": "FALABELLA",
       "CantCartola": "0",
@@ -4169,7 +4264,7 @@
       "Estado": "OK"
     },
     {
-      "FechaCartola": "2026-05-14",
+      "FechaCartola": "2026-05-19",
       "Sociedad": "EL",
       "Ticker": "ITAUCL",
       "CantCartola": "3801",
@@ -4178,16 +4273,16 @@
       "Estado": "OK"
     },
     {
-      "FechaCartola": "2026-05-14",
+      "FechaCartola": "2026-05-19",
       "Sociedad": "EL",
       "Ticker": "LTM",
-      "CantCartola": "21797510",
+      "CantCartola": "30189094",
       "CantFacturas": "-32714826",
-      "Diferencia": "54512336",
-      "Estado": "Diferencia +54,512,336.0"
+      "Diferencia": "62903920",
+      "Estado": "Diferencia +62,903,920.0"
     },
     {
-      "FechaCartola": "2026-05-14",
+      "FechaCartola": "2026-05-19",
       "Sociedad": "EL",
       "Ticker": "MALLPLAZA",
       "CantCartola": "0",
@@ -4196,7 +4291,7 @@
       "Estado": "OK"
     },
     {
-      "FechaCartola": "2026-05-14",
+      "FechaCartola": "2026-05-19",
       "Sociedad": "EL",
       "Ticker": "SQM-B",
       "CantCartola": "0",
