@@ -1,6 +1,6 @@
 """
 Lógica de cálculo de cartera — generado automáticamente desde cartola BCI.
-Posiciones base: cartola 22/05/2026.
+Posiciones base: cartola 02/06/2026.
 NO editar manualmente — se sobreescribe con cada sync.
 """
 from datetime import date
@@ -8,77 +8,76 @@ from datetime import date
 # ── EL LTDA (76.677.950-6) ─────────────────────────────────────────────────────
 # (nemotécnico, nombre, cant_activo, cant_pasivo, precio_cartola)
 EL_ACCIONES = [
-    ("ABC", "Abc S.A.", 23_210_430, 0, 11.0),
-    ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 335.0),
-    ("BCI", "Banco De Credito E Inversiones", 339, 0, 60000.0),
-    ("CENCOSUD", "Cencosud S.A.", 136_229, 0, 2180.0),
-    ("CHILE", "Banco De Chile", 2_126_593, 0, 171.9),
-    ("COPEC", "Empresas Copec S.A.", 21_055, 0, 6425.0),
-    ("ENELAM", "Enel Americas S.A.", 10_158_102, 0, 76.2),
-    ("ITAUCL", "Banco Itau Chile", 3_801, 0, 16950.0),
-    ("LTM", "Latam Airlines Group S.A.", 77_285_174, 0, 22.57),
-    ("SQM-B", "Sociedad Quimica Y Minera De Chile S.A.", 1_156, 0, 72900.0),
+    ("ABC", "Abc S.A.", 23_210_430, 0, 11.5),
+    ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 331.5),
+    ("CENCOSUD", "Cencosud S.A.", 136_229, 0, 2146.0),
+    ("CHILE", "Banco De Chile", 1_126_593, 0, 166.59),
+    ("COPEC", "Empresas Copec S.A.", 21_055, 0, 6340.0),
+    ("ENELAM", "Enel Americas S.A.", 10_158_102, 0, 78.0),
+    ("ITAUCL", "Banco Itau Chile", 3_801, 0, 18000.0),
+    ("LTM", "Latam Airlines Group S.A.", 77_285_174, 0, 23.08),
+    ("SQM-B", "Sociedad Quimica Y Minera De Chile S.A.", 1_156, 0, 74450.0),
 ]
 
 # (nemotécnico, nombre, cantidad, precio_compra, precio_cartola)
 EL_CFI = [
-    ("CFIARRAA-E", "Cfiarraa-E", 4_187, 48138.424, 52812.1579),
+    ("CFIARRAA-E", "Cfiarraa-E", 4_187, 48138.424, 56255.49),
     ("CFITRIPT-E", "Cfitript-E", 1_471, 13280.761, 14000.0),
 ]
 
 # (instrumento, cantidad, f_venta, monto_venta, f_compra, monto_compra)
 EL_SIM = [
-    ("AGUAS-A", 438_600, date(2026,4,23), 156_615_288, date(2026,5,25), 157_417_137),
-    ("COPEC", 2_286, date(2026,4,23), 15_233_218, date(2026,5,25), 15_311_212),
-    ("ENELAM", 7_905_720, date(2026,4,1), 640_284_263, date(2026,5,29), 646_226_202),
     ("ENELAM", 816_050, date(2026,5,11), 66_671_285, date(2026,6,10), 66_991_340),
     ("ENELAM", 1_171_082, date(2026,5,15), 89_295_002, date(2026,6,15), 89_737_906),
-    ("LTM", 5_296_810, date(2026,4,1), 125_004_716, date(2026,5,29), 126_164_717),
+    ("ENELAM", 4_519_053, date(2026,5,29), 356_959_996, date(2026,6,30), 358_787_502),
     ("LTM", 41_799_270, date(2026,5,11), 939_229_597, date(2026,6,10), 943_739_738),
 ]
 
 # ── EMF SPA (77.209.686-0) ──────────────────────────────────────────────────────
 EMF_CFI = [
-    ("CFIARRAA-E", "Cfiarraa-E", 500, 47154.0, 52812.1579),
+    ("CFIARRAA-E", "Cfiarraa-E", 500, 47154.0, 56255.49),
 ]
 
 # (folio, tipo C/V, usd, tc_fwd, f_inicio, f_termino)
 EMF_FWD = [
+    (1843676, "C", 500_000, 890.85, date(2026,5,29), date(2026,6,3)),
     (1841192, "C", 250_000, 888.84, date(2026,5,13), date(2026,6,4)),
     (1842248, "C", 250_000, 904.26, date(2026,5,20), date(2026,6,5)),
     (1842251, "C", 250_000, 899.26, date(2026,5,20), date(2026,6,5)),
+    (1843388, "V", 500_000, 894.02, date(2026,5,28), date(2026,6,12)),
+    (1843390, "V", 500_000, 893.32, date(2026,5,28), date(2026,6,12)),
+    (1843392, "V", 500_000, 893.02, date(2026,5,28), date(2026,6,12)),
     (1840713, "V", 250_000, 889.53, date(2026,5,11), date(2026,6,5)),
     (1842085, "V", 500_000, 906.99, date(2026,5,19), date(2026,6,5)),
+    (1843677, "V", 500_000, 890.9, date(2026,5,29), date(2026,6,3)),
 ]
 
-# Cajas (saldo cartola 22/05/2026)
-CAJA_EL       = 651_597_681
-OPS_LIQUIDAR  = -84_418_128
+# Cajas (saldo cartola 02/06/2026)
+CAJA_EL       = 2_714
+OPS_LIQUIDAR  = 0
 CAJA_EMF      = 105_733_620
 
-# Precios base (cartola 22/05/2026)
+# Precios base (cartola 02/06/2026)
 PRECIOS_DEFAULT = {
-    "UF": 40458.69,
-    "USD": 899.68,
-    "EUR": 1046.26,
-    "ABC": 11.0,
-    "AGUAS-A": 335.0,
-    "BCI": 60000.0,
-    "CENCOSUD": 2180.0,
-    "CFIARRAA-E": 52812.1579,
+    "UF": 40644.55,
+    "USD": 892.91,
+    "EUR": 1038.75,
+    "ABC": 11.5,
+    "AGUAS-A": 331.5,
+    "CENCOSUD": 2146.0,
+    "CFIARRAA-E": 56255.49,
     "CFITRIPT-E": 14000.0,
-    "CHILE": 171.9,
-    "COPEC": 6425.0,
-    "ENELAM": 76.2,
-    "ITAUCL": 16950.0,
-    "LTM": 22.57,
-    "SQM-B": 72900.0,
+    "CHILE": 166.59,
+    "COPEC": 6340.0,
+    "ENELAM": 78.0,
+    "ITAUCL": 18000.0,
+    "LTM": 23.08,
+    "SQM-B": 74450.0,
 }
 
 INSTRUMENTOS_META = {
     "ABC": {"nombre": "Abc S.A.", "tipo": "accion", "fmt": ".4f"},
     "AGUAS-A": {"nombre": "Aguas Andinas S.A.", "tipo": "accion", "fmt": ".4f"},
-    "BCI": {"nombre": "Banco De Credito E Inversiones", "tipo": "accion", "fmt": ".4f"},
     "CENCOSUD": {"nombre": "Cencosud S.A.", "tipo": "accion", "fmt": ".4f"},
     "CHILE": {"nombre": "Banco De Chile", "tipo": "accion", "fmt": ".4f"},
     "COPEC": {"nombre": "Empresas Copec S.A.", "tipo": "accion", "fmt": ".4f"},
