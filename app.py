@@ -5,6 +5,7 @@ En Railway: gunicorn app:app
 
 === FIXES APLICADOS ===
 Fix 1: Scheduler con retry cada 1 min entre 8:55 y 9:15 (horario exacto del correo de BCI)Fix 3: Query Gmail usa email directo (antes: display name que podía no matchear)
+Fix 2: Botón "Actualizar" dispara sincronización manual (sin restricción de fecha)
 Fix 4: Nuevo endpoint /api/actualizar_facturas + sync automático de facturas
 """
 
@@ -343,7 +344,8 @@ def actualizar_facturas():
 
 # ── FIX 1: Endpoint manual para actualizar cartola ───────────────────────────
 
-@app.route("/api/actualizar_cartola", methods=["POST"])
+@app.route("/api/7
+", methods=["POST"])
 def actualizar_cartola():
     """
     Descarga la cartola de hoy desde Gmail y actualiza cartola_data.json.
