@@ -4,8 +4,7 @@ Ejecutar localmente: python app.py
 En Railway: gunicorn app:app
 
 === FIXES APLICADOS ===
-Fix 1: Scheduler con retry cada 15 min entre 10:00 y 14:00 (antes: ventana fija 09:30-09:59)
-Fix 3: Query Gmail usa email directo (antes: display name que podía no matchear)
+Fix 1: Scheduler con retry cada 1 min entre 8:55 y 9:15 (horario exacto del correo de BCI)Fix 3: Query Gmail usa email directo (antes: display name que podía no matchear)
 Fix 4: Nuevo endpoint /api/actualizar_facturas + sync automático de facturas
 """
 
@@ -437,7 +436,7 @@ def _iniciar_scheduler():
 
                 # ── Sync cartola: 10:00 a 14:00, cada 15 min ──────────
                 if (es_habil
-                    and 10 <= hora < 14
+                    and (hora == 8 and minuto >= 55) or (hora == 9 and minuto <= 15)
                     and hoy != cartola_ultimo_dia):
 
                     logging.info("Scheduler: intentando sync cartola (intento %02d:%02d)",
@@ -486,7 +485,10 @@ if os.environ.get("RAILWAY_ENVIRONMENT") or os.environ.get("INICIAR_SCHEDULER"):
     _iniciar_scheduler()
 
 
-if __name__ == "__main__":
-    _iniciar_scheduler()
+try:
+        _iniciar_scheduler()
+        logging.info("Scheduler iniciado exitosamente en Replit")
+except Exception as e:
+        logging.error("Error iniciando scheduler: %s", e, exc_info=True)_iniciar_scheduler()
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=False)
