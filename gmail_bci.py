@@ -89,6 +89,8 @@ def autenticar():
 # ── Búsqueda y descarga del email ─────────────────────────────────────────────
 
 def buscar_email_bci(service, fecha: date = None):
+        if not fecha:
+                    fecha = date.today()
     """
     Busca el email más reciente de BCI con adjunto ZIP.
 
