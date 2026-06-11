@@ -1,3 +1,4 @@
+
 """
 Aplicación web — Cartera BCI: EL LTDA y EMF SPA
 Ejecutar localmente: python app.py
@@ -369,6 +370,7 @@ def actualizar_cartola():
 # ── Lógica de sync compartida ────────────────────────────────────────────────
 
 def _ejecutar_sync_cartola(fecha=None):
+    fecha = date.today()  # Siempre buscar de hoy, nunca del pasado
     """
     Descarga, parsea y guarda la cartola.
     También actualiza precios.json con los precios de la cartola.
