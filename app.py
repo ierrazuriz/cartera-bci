@@ -1,11 +1,12 @@
+
 """
 Aplicación web — Cartera BCI: EL LTDA y EMF SPA
 Ejecutar localmente: python app.py
 En Railway: gunicorn app:app
 
 === FIXES APLICADOS ===
-Fix 1: Scheduler con retry cada 15 min entre 10:00 y 14:00 (antes: ventana fija 09:30-09:59)
-Fix 3: Query Gmail usa email directo (antes: display name que podía no matchear)
+Fix 1: Scheduler con retry cada 1 min entre 8:55 y 9:15 (horario exacto del correo de BCI)Fix 3: Query Gmail usa email directo (antes: display name que podía no matchear)
+Fix 2: Botón "Actualizar" dispara sincronización manual (sin restricción de fecha)
 Fix 4: Nuevo endpoint /api/actualizar_facturas + sync automático de facturas
 """
 
@@ -344,7 +345,8 @@ def actualizar_facturas():
 
 # ── FIX 1: Endpoint manual para actualizar cartola ───────────────────────────
 
-@app.route("/api/actualizar_cartola", methods=["POST"])
+@app.route("/api/7
+", methods=["POST"])
 def actualizar_cartola():
     """
     Descarga la cartola de hoy desde Gmail y actualiza cartola_data.json.
@@ -368,6 +370,7 @@ def actualizar_cartola():
 # ── Lógica de sync compartida ────────────────────────────────────────────────
 
 def _ejecutar_sync_cartola(fecha=None):
+    fecha = date.today()  # Siempre buscar de hoy, nunca del pasado
     """
     Descarga, parsea y guarda la cartola.
     También actualiza precios.json con los precios de la cartola.
@@ -411,8 +414,7 @@ def _ejecutar_sync_cartola(fecha=None):
 def _iniciar_scheduler():
     """
     Scheduler mejorado:
-    - Intenta cada 15 minutos entre 10:00 y 14:00 hora Chile (días hábiles)
-    - Si encuentra cartola de HOY, la procesa y para hasta mañana
+    - Intenta cada 1 minuto entre 8:55 y 9:15 hora Chile (días hábiles)    - Si encuentra cartola de HOY, la procesa y para hasta mañana
     - Si falla, reintenta en 15 min (máximo hasta las 14:00)
     - También sincroniza facturas una vez al día a las 14:30
     """
@@ -421,8 +423,7 @@ def _iniciar_scheduler():
     import zoneinfo
 
     TZ_CHILE = zoneinfo.ZoneInfo("America/Santiago")
-    INTERVALO_RETRY = 15 * 60  # 15 minutos en segundos
-
+    INTERVALO_RETRY = 60  # 1 minuto en segundos
     def _loop():
         cartola_ultimo_dia = None
         facturas_ultimo_dia = None
@@ -435,9 +436,8 @@ def _iniciar_scheduler():
                 hora = ahora.hour
                 minuto = ahora.minute
 
-                # ── Sync cartola: 10:00 a 14:00, cada 15 min ──────────
-                if (es_habil
-                    and 10 <= hora < 14
+                # ── Sync cartola: 8:55 a 9:15, cada 1 min ──────────                if (es_habil
+and ((hora == 8 and minuto >= 55) or (hora == 9 and minuto <= 15))
                     and hoy != cartola_ultimo_dia):
 
                     logging.info("Scheduler: intentando sync cartola (intento %02d:%02d)",
@@ -486,7 +486,10 @@ if os.environ.get("RAILWAY_ENVIRONMENT") or os.environ.get("INICIAR_SCHEDULER"):
     _iniciar_scheduler()
 
 
-if __name__ == "__main__":
-    _iniciar_scheduler()
+try:
+        _iniciar_scheduler()
+        logging.info("Scheduler iniciado exitosamente en Replit")
+except Exception as e:
+        logging.error("Error iniciando scheduler: %s", e, exc_info=True)_iniciar_scheduler()
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=False)
