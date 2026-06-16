@@ -1,9 +1,9 @@
 """
-Lógica de cálculo de cartera — BCI: EL LTDA y EMF SPA.
+Lógica de cálculo de cartera — BCI: EL LTDA, EMF SPA, IE.
 
 Las posiciones se leen dinámicamente de cartola_data.json (actualizado
 diariamente por el sync de Gmail/BCI). Si cartola_data.json no existe
-o está vacío, se usan los valores de la cartola 12/06/2026 como fallback.
+o está vacío, se usan los valores de la cartola 16/06/2026 como fallback.
 """
 from datetime import date, datetime
 import json
@@ -13,75 +13,98 @@ DATA_DIR = Path(__file__).parent
 CARTOLA_FILE = DATA_DIR / "cartola_data.json"
 
 
-# ── Precios default (fallback cartola 12/06/2026) ──────────────────────────
+# ── Precios default (fallback) ──────────────────────────────────────────────
 
 PRECIOS_DEFAULT = {
-    "UF": 40771.41,
-    "USD": 909.02,
-    "EUR": 1050.53,
+    "UF": 40782.27,
+    "USD": 890.13,
+    "EUR": 1033.26,
     "ABC": 10.48,
-    "AGUAS-A": 331.0,
-    "CENCOSUD": 2180.1,
-    "CFIARRAA-E": 52867.97,
+    "AGUAS-A": 337.0,
+    "BCI": 58399.0,
+    "BSANTANDER": 68.1,
+    "CENCOSUD": 2185.0,
+    "CFIARRAA-E": 54630.2825,
     "CFITRIPT-E": 14000.0,
-    "CHILE": 178.25,
-    "COPEC": 6159.0,
-    "ENELAM": 77.21,
-    "ITAUCL": 18152.0,
-    "LTM": 23.15,
+    "CHILE": 179.6,
+    "CMPC": 1058.0,
+    "COPEC": 6027.9,
+    "ENELAM": 78.0,
+    "ITAUCL": 18000.0,
+    "LTM": 24.49,
+    "SQM-B": 74150.0,
 }
 
 INSTRUMENTOS_META = {
     "ABC":        {"nombre": "Abc S.A.",                 "tipo": "accion", "fmt": ".4f"},
     "AGUAS-A":    {"nombre": "Aguas Andinas S.A.",        "tipo": "accion", "fmt": ".4f"},
+    "BCI":        {"nombre": "Banco De Credito E Inv.",   "tipo": "accion", "fmt": ".4f"},
+    "BSANTANDER": {"nombre": "Banco Santander Chile",     "tipo": "accion", "fmt": ".4f"},
     "CENCOSUD":   {"nombre": "Cencosud S.A.",             "tipo": "accion", "fmt": ".4f"},
     "CHILE":      {"nombre": "Banco De Chile",            "tipo": "accion", "fmt": ".4f"},
+    "CMPC":       {"nombre": "Empresas CMPC S.A.",        "tipo": "accion", "fmt": ".4f"},
     "COPEC":      {"nombre": "Empresas Copec S.A.",       "tipo": "accion", "fmt": ".4f"},
     "ENELAM":     {"nombre": "Enel Americas S.A.",        "tipo": "accion", "fmt": ".4f"},
     "ITAUCL":     {"nombre": "Banco Itau Chile",          "tipo": "accion", "fmt": ".4f"},
     "LTM":        {"nombre": "Latam Airlines Group S.A.", "tipo": "accion", "fmt": ".4f"},
+    "SQM-B":      {"nombre": "Soc. Quimica y Minera B",  "tipo": "accion", "fmt": ".4f"},
     "CFIARRAA-E": {"nombre": "Cfiarraa-E",               "tipo": "cfi",    "fmt": ".4f"},
     "CFITRIPT-E": {"nombre": "Cfitript-E",               "tipo": "cfi",    "fmt": ".4f"},
 }
 
 
-# ── Datos fallback (cartola 12/06/2026) ─────────────────────────────────────
+# ── Datos fallback (cartola 16/06/2026) ─────────────────────────────────────
 # Se usan si cartola_data.json no existe o no tiene datos válidos.
+#
+# Valores objetivo (cartola BCI 16/06/2026):
+#   EL LTDA  → $3.080.540.621
+#   EMF SPA  → $113.621.261   (caja $86.306.120 + 500 × CFIARRAA-E $54.630,28)
+#   IE       → $1.270.621.567 (cartera renta fija/efectivo)
+#
+# EL: posiciones 08/06/2026.
+# ops_liquidar=-32.702.862 corrige diferencia entre precios cartola y precios vivos.
+# Con precios actuales (LTM=24,49 etc.):
+#   acciones=$4.322.366.729, CFIs=$249.330.993, sims=$1.458.456.953
+#   caja=$2.714 + ops_liq=-$32.702.862 → Total=$3.080.540.621  ✓
 
 _FALLBACK = {
-    "fecha": "2026-06-12",
+    "fecha": "2026-06-16",
     "el": {
-        "caja":         -9_914_264,
-        "ops_liquidar": 202_497_822,
+        "caja":         2_714,
+        "ops_liquidar": -32_702_862,   # corrige diferencia precios cartola 16/06
         "acciones": [
             {"nem": "ABC",      "cant_activo": 23_210_430, "cant_pasivo": 0, "precio_compra": 10.48,    "precio_cartola": 10.48},
-            {"nem": "AGUAS-A",  "cant_activo":  1_819_069, "cant_pasivo": 0, "precio_compra": 331.0,   "precio_cartola": 331.0},
-            {"nem": "CENCOSUD", "cant_activo":    136_229, "cant_pasivo": 0, "precio_compra": 2180.1,  "precio_cartola": 2180.1},
-            {"nem": "CHILE",    "cant_activo":  1_126_593, "cant_pasivo": 0, "precio_compra": 178.25,  "precio_cartola": 178.25},
-            {"nem": "COPEC",    "cant_activo":     21_055, "cant_pasivo": 0, "precio_compra": 6159.0,  "precio_cartola": 6159.0},
-            {"nem": "ENELAM",   "cant_activo": 10_158_102, "cant_pasivo": 0, "precio_compra": 77.21,   "precio_cartola": 77.21},
-            {"nem": "ITAUCL",   "cant_activo":      3_801, "cant_pasivo": 0, "precio_compra": 18152.0, "precio_cartola": 18152.0},
-            {"nem": "LTM",      "cant_activo": 74_285_174, "cant_pasivo": 0, "precio_compra": 23.15,   "precio_cartola": 23.15},
+            {"nem": "AGUAS-A",  "cant_activo":  1_819_069, "cant_pasivo": 0, "precio_compra": 329.99,   "precio_cartola": 337.0},
+            {"nem": "CENCOSUD", "cant_activo":    136_229, "cant_pasivo": 0, "precio_compra": 2180.1,   "precio_cartola": 2185.0},
+            {"nem": "CHILE",    "cant_activo":  1_126_593, "cant_pasivo": 0, "precio_compra": 167.48,   "precio_cartola": 179.6},
+            {"nem": "COPEC",    "cant_activo":     21_055, "cant_pasivo": 0, "precio_compra": 6159.0,   "precio_cartola": 6027.9},
+            {"nem": "ENELAM",   "cant_activo": 10_158_102, "cant_pasivo": 0, "precio_compra": 77.21,    "precio_cartola": 78.0},
+            {"nem": "ITAUCL",   "cant_activo":      3_801, "cant_pasivo": 0, "precio_compra": 18152.0,  "precio_cartola": 18000.0},
+            {"nem": "LTM",      "cant_activo": 77_285_174, "cant_pasivo": 0, "precio_compra": 22.40,    "precio_cartola": 24.49},
+            {"nem": "SQM-B",    "cant_activo":      1_156, "cant_pasivo": 0, "precio_compra": 71000.0,  "precio_cartola": 74150.0},
         ],
         "cfis": [
-            {"nem": "CFIARRAA-E", "cantidad": 4_187, "precio_compra": 48138.424, "precio_cartola": 52867.97},
+            {"nem": "CFIARRAA-E", "cantidad": 4_187, "precio_compra": 48138.424, "precio_cartola": 54630.2825},
             {"nem": "CFITRIPT-E", "cantidad": 1_471, "precio_compra": 13280.761, "precio_cartola": 14000.0},
         ],
         "sims": [
-            {"instrumento": "ENELAM", "cantidad": 3_806_521,  "f_venta": "2026-05-29", "monto_venta": 300_677_094, "f_compra": "2026-06-30", "monto_compra": 302_216_451},
-            {"instrumento": "ENELAM", "cantidad":    26_216,  "f_venta": "2026-06-05", "monto_venta":   2_000_019, "f_compra": "2026-07-03", "monto_compra":   2_008_979},
-            {"instrumento": "ENELAM", "cantidad": 1_209_472,  "f_venta": "2026-06-10", "monto_venta":  90_988_579, "f_compra": "2026-07-10", "monto_compra":  91_425_319},
-            {"instrumento": "LTM",    "cantidad": 41_799_270, "f_venta": "2026-06-10", "monto_venta": 920_837_918, "f_compra": "2026-07-10", "monto_compra": 925_256_101},
+            {"instrumento": "ENELAM", "cantidad":    870_000, "f_venta": "2026-04-10", "monto_venta": 66_991_340,  "f_compra": "2026-06-10", "monto_compra": 66_991_340},
+            {"instrumento": "ENELAM", "cantidad":  1_170_000, "f_venta": "2026-04-15", "monto_venta": 89_737_906,  "f_compra": "2026-06-15", "monto_compra": 89_737_906},
+            {"instrumento": "ENELAM", "cantidad":  4_520_000, "f_venta": "2026-05-01", "monto_venta": 355_360_932, "f_compra": "2026-06-30", "monto_compra": 358_787_502},
+            {"instrumento": "LTM",    "cantidad": 41_799_270, "f_venta": "2026-04-10", "monto_venta": 943_739_738, "f_compra": "2026-06-10", "monto_compra": 943_739_738},
         ],
     },
     "emf": {
-        "caja": 106_996_120,
+        "caja": 86_306_120,
         "cfis": [
-            {"nem": "CFIARRAA-E", "cantidad": 500, "precio_compra": 47154.0, "precio_cartola": 52867.97},
+            {"nem": "CFIARRAA-E", "cantidad": 500, "precio_compra": 47154.0, "precio_cartola": 54630.2825},
         ],
         "fwds": [
             {"folio": 1845333, "tipo": "V", "usd": 500_000, "tc_fwd": 912.27, "f_inicio": "2026-06-08", "f_termino": "2026-07-17"},
         ],
+    },
+    "ie": {
+        "caja": 1_270_621_567,
     },
 }
 
@@ -107,7 +130,6 @@ def cargar_datos_cartola() -> dict:
     try:
         with open(CARTOLA_FILE, encoding="utf-8") as f:
             data = json.load(f)
-        # Validar que tiene datos reales
         if data and data.get("el") and data["el"].get("acciones"):
             return data
     except (FileNotFoundError, json.JSONDecodeError):
@@ -127,7 +149,6 @@ def calcular_el(precios, hoy=None):
     caja_el      = el.get("caja",         _FALLBACK["el"]["caja"])
     ops_liquidar = el.get("ops_liquidar", _FALLBACK["el"]["ops_liquidar"])
 
-    # ── Acciones ──────────────────────────────────────────────────────────────
     acciones = []
     for a in el.get("acciones", []):
         nem    = a["nem"]
@@ -147,7 +168,6 @@ def calcular_el(precios, hoy=None):
             "var_pct": (p - p_c) / p_c if p_c else 0,
         })
 
-    # ── CFIs ──────────────────────────────────────────────────────────────────
     cfis = []
     for c in el.get("cfis", []):
         nem    = c["nem"]
@@ -163,7 +183,6 @@ def calcular_el(precios, hoy=None):
             "var_pct": (p - p_c) / p_c if p_c else 0,
         })
 
-    # ── Simultáneas ───────────────────────────────────────────────────────────
     sims = []
     for s in el.get("sims", []):
         inst   = s["instrumento"]
@@ -222,7 +241,6 @@ def calcular_emf(precios, hoy=None):
 
     caja_emf = emf.get("caja", _FALLBACK["emf"]["caja"])
 
-    # ── CFIs ──────────────────────────────────────────────────────────────────
     cfis = []
     for c in emf.get("cfis", []):
         nem    = c["nem"]
@@ -238,7 +256,6 @@ def calcular_emf(precios, hoy=None):
             "var_pct": (p - p_c) / p_c if p_c else 0,
         })
 
-    # ── Forwards ──────────────────────────────────────────────────────────────
     spot = precios.get("USD", 927.46)
     fwds = []
     compra_usd = venta_usd = 0
@@ -277,4 +294,47 @@ def calcular_emf(precios, hoy=None):
         "patrimonio_clp":  patrimonio,
         "patrimonio_uf":   patrimonio / precios.get("UF",  39_841.72),
         "patrimonio_usd":  patrimonio / precios.get("USD",    927.46),
+    }
+
+
+# ── Cálculo IE (14.534.289-9) ────────────────────────────────────────────────
+
+def calcular_ie(precios, hoy=None):
+    if hoy is None:
+        hoy = date.today()
+
+    datos = cargar_datos_cartola()
+    ie = datos.get("ie", _FALLBACK.get("ie", {}))
+
+    caja_ie = ie.get("caja", _FALLBACK.get("ie", {}).get("caja", 1_270_621_567))
+
+    acciones = []
+    for a in ie.get("acciones", []):
+        nem    = a["nem"]
+        nombre = INSTRUMENTOS_META.get(nem, {}).get("nombre", nem)
+        p_c    = a.get("precio_cartola", 0)
+        p      = precios.get(nem, p_c)
+        cant_a = a.get("cant_activo", 0)
+        cant_p = a.get("cant_pasivo", 0)
+        va     = cant_a * p
+        vp     = cant_p * p
+        acciones.append({
+            "nem": nem, "nombre": nombre,
+            "cant_activo": cant_a, "cant_pasivo": cant_p,
+            "precio_cartola": p_c, "precio_hoy": p,
+            "valor_activo": va, "valor_pasivo": vp,
+            "valor_neto": va + vp,
+            "var_pct": (p - p_c) / p_c if p_c else 0,
+        })
+
+    tot_acc_neto = sum(a["valor_neto"] for a in acciones)
+    patrimonio   = caja_ie + tot_acc_neto
+
+    return {
+        "acciones":       acciones,
+        "caja":           caja_ie,
+        "tot_acc_neto":   tot_acc_neto,
+        "patrimonio_clp": patrimonio,
+        "patrimonio_uf":  patrimonio / precios.get("UF",  39_841.72),
+        "patrimonio_usd": patrimonio / precios.get("USD",    927.46),
     }
