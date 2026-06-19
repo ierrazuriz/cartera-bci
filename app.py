@@ -1,20 +1,23 @@
-
 """
 Aplicación web — Cartera BCI: EL LTDA y EMF SPA
 Ejecutar localmente: python app.py
-En Railway: gunicorn app:app
+En Replit/Railway: gunicorn app:app
 
 === FIXES APLICADOS ===
-Fix 1: Scheduler con retry cada 1 min entre 8:55 y 9:15 (horario exacto del correo de BCI)Fix 3: Query Gmail usa email directo (antes: display name que podía no matchear)
+Fix 1: Scheduler con retry cada 1 min entre 8:55 y 9:15 (horario exacto del correo de BCI)
 Fix 2: Botón "Actualizar" dispara sincronización manual (sin restricción de fecha)
+Fix 3: Query Gmail usa email directo (antes: display name que podía no matchear)
 Fix 4: Nuevo endpoint /api/actualizar_facturas + sync automático de facturas
+Fix 5: import requests corregido (_requestsh → _requests)
+Fix 6: Ruta /api/actualizar_cartola corregida (tenía \n en el path)
+Fix 7: Scheduler se inicia una sola vez al arrancar
 """
 
 import os
 import json
 import logging
 import threading
-import requests as _requestsh
+import requests as _requests
 from datetime import date
 from flask import Flask, render_template, request, redirect, url_for, send_file, jsonify
 
@@ -109,13 +112,11 @@ def index():
     precios = load_precios()
     hoy = date.today()
 
-    # FIX 2: cargar datos dinámicos desde cartola_data.json
     datos_cartola = cargar_datos_cartola()
     el = calcular_el(precios, hoy)
     emf = calcular_emf(precios, hoy)
     pat_total = el["patrimonio_clp"] + emf["patrimonio_clp"]
 
-    # Fecha base de la cartola (para mostrar en el header)
     fecha_base = datos_cartola.get("fecha", "sin datos") if datos_cartola else "sin datos"
 
     return render_template(
@@ -343,14 +344,13 @@ def actualizar_facturas():
     return jsonify({"status": "actualizando facturas en segundo plano"})
 
 
-# ── FIX 1: Endpoint manual para actualizar cartola ───────────────────────────
+# ── FIX 2 + FIX 6: Endpoint manual para actualizar cartola ───────────────────
 
-@app.route("/api/7
-", methods=["POST"])
+@app.route("/api/actualizar_cartola", methods=["POST"])
 def actualizar_cartola():
     """
     Descarga la cartola de hoy desde Gmail y actualiza cartola_data.json.
-    Llamado por el scheduler diario o manualmente.
+    Llamado por el scheduler diario o manualmente desde el botón Actualizar.
     """
     token = request.headers.get("X-Actualizar-Token", "")
     secret = os.environ.get("ACTUALIZAR_SECRET", "")
@@ -370,11 +370,13 @@ def actualizar_cartola():
 # ── Lógica de sync compartida ────────────────────────────────────────────────
 
 def _ejecutar_sync_cartola(fecha=None):
-    fecha = date.today()  # Siempre buscar de hoy, nunca del pasado
     """
     Descarga, parsea y guarda la cartola.
+    Siempre busca la cartola de HOY.
     También actualiza precios.json con los precios de la cartola.
     """
+    fecha = date.today()  # Siempre buscar de hoy, nunca del pasado
+
     import gmail_bci as gb
     import parsear_cartola as pc
 
@@ -408,14 +410,15 @@ def _ejecutar_sync_cartola(fecha=None):
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# FIX 1: Scheduler con retry cada 15 min entre 10:00 y 14:00
+# FIX 1 + FIX 7: Scheduler — se inicia UNA sola vez al arrancar
 # ══════════════════════════════════════════════════════════════════════════════
 
 def _iniciar_scheduler():
     """
-    Scheduler mejorado:
-    - Intenta cada 1 minuto entre 8:55 y 9:15 hora Chile (días hábiles)    - Si encuentra cartola de HOY, la procesa y para hasta mañana
-    - Si falla, reintenta en 15 min (máximo hasta las 14:00)
+    Scheduler:
+    - Intenta cada 1 minuto entre 8:55 y 9:15 hora Chile (días hábiles)
+    - Si encuentra cartola de HOY, la procesa y para hasta mañana
+    - Si falla, reintenta en 1 min (máximo hasta las 9:15)
     - También sincroniza facturas una vez al día a las 14:30
     """
     import time
@@ -423,7 +426,8 @@ def _iniciar_scheduler():
     import zoneinfo
 
     TZ_CHILE = zoneinfo.ZoneInfo("America/Santiago")
-    INTERVALO_RETRY = 60  # 1 minuto en segundos
+    INTERVALO_RETRY = 60  # 1 minuto
+
     def _loop():
         cartola_ultimo_dia = None
         facturas_ultimo_dia = None
@@ -436,27 +440,21 @@ def _iniciar_scheduler():
                 hora = ahora.hour
                 minuto = ahora.minute
 
-                # ── Sync cartola: 8:55 a 9:15, cada 1 min ──────────                if (es_habil
-and ((hora == 8 and minuto >= 55) or (hora == 9 and minuto <= 15))
-                    and hoy != cartola_ultimo_dia):
-
-                    logging.info("Scheduler: intentando sync cartola (intento %02d:%02d)",
-                                 hora, minuto)
+                # ── Sync cartola: 8:55 a 9:15, cada 1 min ──────────────────
+                en_ventana = (hora == 8 and minuto >= 55) or (hora == 9 and minuto <= 15)
+                if es_habil and en_ventana and hoy != cartola_ultimo_dia:
+                    logging.info("Scheduler: intentando sync cartola (%02d:%02d)", hora, minuto)
                     try:
                         _ejecutar_sync_cartola()
                         cartola_ultimo_dia = hoy
                         logging.info("Scheduler: cartola actualizada exitosamente (%s)", hoy)
                     except ValueError as e:
-                        # "No se encontró email" — reintentará en 15 min
                         logging.warning("Scheduler: cartola no disponible aún: %s", e)
                     except Exception as e:
                         logging.error("Scheduler: error en sync cartola: %s", e, exc_info=True)
 
-                # ── Sync facturas: una vez al día a las 14:30+ ────────
-                if (es_habil
-                    and hora == 14 and minuto >= 30
-                    and hoy != facturas_ultimo_dia):
-
+                # ── Sync facturas: una vez al día a las 14:30+ ────────────
+                if es_habil and hora == 14 and minuto >= 30 and hoy != facturas_ultimo_dia:
                     logging.info("Scheduler: sincronizando facturas...")
                     try:
                         import gmail_facturas as gf
@@ -473,23 +471,19 @@ and ((hora == 8 and minuto >= 55) or (hora == 9 and minuto <= 15))
 
     t = threading.Thread(target=_loop, daemon=True)
     t.start()
-    logging.info("Scheduler iniciado: cartola 10:00-14:00 cada 15min, facturas 14:30")
+    logging.info("Scheduler iniciado: cartola 8:55-9:15 cada 1min, facturas 14:30")
 
+
+# ── Arranque ──────────────────────────────────────────────────────────────────
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
 )
 
-# Solo iniciar el scheduler en producción (Railway)
-if os.environ.get("RAILWAY_ENVIRONMENT") or os.environ.get("INICIAR_SCHEDULER"):
-    _iniciar_scheduler()
+# FIX 7: Una sola llamada, siempre (funciona en Replit y Railway)
+_iniciar_scheduler()
 
-
-try:
-        _iniciar_scheduler()
-        logging.info("Scheduler iniciado exitosamente en Replit")
-except Exception as e:
-        logging.error("Error iniciando scheduler: %s", e, exc_info=True)_iniciar_scheduler()
+if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=False)

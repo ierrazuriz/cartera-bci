@@ -38,6 +38,7 @@ TOKEN_FILE = "token.json"
 RUTS = {
     "76677950": "EL",   # EL LTDA (76.677.950-6)
     "77209686": "EMF",  # EMF SPA (77.209.686-0)
+    "14534289": "IE",   # IE (14.534.289-9)
 }
 
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
