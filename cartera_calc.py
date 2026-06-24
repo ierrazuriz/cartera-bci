@@ -1,6 +1,6 @@
 """
 Lógica de cálculo de cartera — generado automáticamente desde cartola BCI.
-Posiciones base: cartola 23/06/2026.
+Posiciones base: cartola 24/06/2026.
 NO editar manualmente — se sobreescribe con cada sync.
 """
 from datetime import date
@@ -8,17 +8,17 @@ from datetime import date
 # ── EL LTDA (76.677.950-6) ─────────────────────────────────────────────────────
 # (nemotécnico, nombre, cant_activo, cant_pasivo, precio_cartola)
 EL_ACCIONES = [
-    ("ABC", "Abc S.A.", 23_210_430, 0, 10.02),
-    ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 335.45),
-    ("CENCOSUD", "Cencosud S.A.", 136_229, 0, 2160.0),
-    ("COPEC", "Empresas Copec S.A.", 21_055, 0, 5980.0),
-    ("ENELAM", "Enel Americas S.A.", 7_106_326, 0, 83.4),
-    ("ITAUCL", "Banco Itau Chile", 3_801, 0, 18000.0),
+    ("ABC", "Abc S.A.", 23_210_430, 0, 10.4),
+    ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 336.0),
+    ("CENCOSUD", "Cencosud S.A.", 136_229, 0, 2159.0),
+    ("COPEC", "Empresas Copec S.A.", 21_055, 0, 5967.0),
+    ("ENELAM", "Enel Americas S.A.", 7_106_326, 0, 82.8),
+    ("ITAUCL", "Banco Itau Chile", 3_801, 0, 17900.0),
 ]
 
 # (nemotécnico, nombre, cantidad, precio_compra, precio_cartola)
 EL_CFI = [
-    ("CFIARRAA-E", "Cfiarraa-E", 4_187, 48138.424, 52924.38),
+    ("CFIARRAA-E", "Cfiarraa-E", 4_187, 48138.424, 53200.0),
     ("CFITRIPT-E", "Cfitript-E", 1_471, 13280.761, 14000.0),
 ]
 
@@ -28,7 +28,7 @@ EL_SIM = [
 
 # ── EMF SPA (77.209.686-0) ──────────────────────────────────────────────────────
 EMF_CFI = [
-    ("CFIARRAA-E", "Cfiarraa-E", 500, 47154.0, 52924.38),
+    ("CFIARRAA-E", "Cfiarraa-E", 500, 47154.0, 53200.0),
 ]
 
 # (folio, tipo C/V, usd, tc_fwd, f_inicio, f_termino)
@@ -38,24 +38,24 @@ EMF_FWD = [
     (1847423, "V", 500_000, 894.22, date(2026,6,18), date(2026,8,6)),
 ]
 
-# Cajas (saldo cartola 23/06/2026)
-CAJA_EL       = 875_474_957
-OPS_LIQUIDAR  = 57_995_398
+# Cajas (saldo cartola 24/06/2026)
+CAJA_EL       = 933_576_845
+OPS_LIQUIDAR  = 0
 CAJA_EMF      = 86_306_120
 
-# Precios base (cartola 23/06/2026)
+# Precios base (cartola 24/06/2026)
 PRECIOS_DEFAULT = {
-    "UF": 40801.29,
-    "USD": 905.78,
-    "EUR": 1035.06,
-    "ABC": 10.02,
-    "AGUAS-A": 335.45,
-    "CENCOSUD": 2160.0,
-    "CFIARRAA-E": 52924.38,
+    "UF": 40804.0,
+    "USD": 915.58,
+    "EUR": 1041.73,
+    "ABC": 10.4,
+    "AGUAS-A": 336.0,
+    "CENCOSUD": 2159.0,
+    "CFIARRAA-E": 53200.0,
     "CFITRIPT-E": 14000.0,
-    "COPEC": 5980.0,
-    "ENELAM": 83.4,
-    "ITAUCL": 18000.0,
+    "COPEC": 5967.0,
+    "ENELAM": 82.8,
+    "ITAUCL": 17900.0,
 }
 
 INSTRUMENTOS_META = {

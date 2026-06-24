@@ -1,5 +1,5 @@
 {
-  "sync_at": "2026-06-23T09:15:37.973363",
+  "sync_at": "2026-06-24T09:51:36.996872",
   "movimientos": [
     {
       "Fecha": "2026-04-01",
@@ -2193,6 +2193,23 @@
       "IVA": "43178",
       "Total": "270428",
       "ValorPagar": ""
+    },
+    {
+      "Fecha": "2026-06-23",
+      "FechaPago": "2026-06-25",
+      "N°Factura": "3931754",
+      "Sociedad": "",
+      "Ticker": "SQM-B",
+      "Tipo": "COMPRA",
+      "TipoActivo": "Acciones Nacionales",
+      "APB": "Sí",
+      "PrecioUnit": "70495",
+      "Cantidad": "62",
+      "Monto": "4370690",
+      "Comision": "",
+      "IVA": "",
+      "Total": "",
+      "ValorPagar": "705249830"
     }
   ],
   "dividendos": [
@@ -5507,7 +5524,7 @@
   ],
   "comparacion": [
     {
-      "FechaCartola": "2026-06-23",
+      "FechaCartola": "2026-06-24",
       "Sociedad": "14.534.289-9",
       "Ticker": "CMPC",
       "CantCartola": "1075238",
@@ -5516,16 +5533,16 @@
       "Estado": "Solo en cartola"
     },
     {
-      "FechaCartola": "2026-06-23",
+      "FechaCartola": "2026-06-24",
       "Sociedad": "14.534.289-9",
       "Ticker": "SQM-B",
-      "CantCartola": "7548",
+      "CantCartola": "17548",
       "CantFacturas": "0",
-      "Diferencia": "7548",
+      "Diferencia": "17548",
       "Estado": "Solo en cartola"
     },
     {
-      "FechaCartola": "2026-06-23",
+      "FechaCartola": "2026-06-24",
       "Sociedad": "EL",
       "Ticker": "ABC",
       "CantCartola": "23210430",
@@ -5534,7 +5551,7 @@
       "Estado": "Solo en cartola"
     },
     {
-      "FechaCartola": "2026-06-23",
+      "FechaCartola": "2026-06-24",
       "Sociedad": "EL",
       "Ticker": "AGUAS-A",
       "CantCartola": "1819069",
@@ -5543,7 +5560,7 @@
       "Estado": "Diferencia +2,069,069.0"
     },
     {
-      "FechaCartola": "2026-06-23",
+      "FechaCartola": "2026-06-24",
       "Sociedad": "EL",
       "Ticker": "BCI",
       "CantCartola": "0",
@@ -5552,7 +5569,7 @@
       "Estado": "OK"
     },
     {
-      "FechaCartola": "2026-06-23",
+      "FechaCartola": "2026-06-24",
       "Sociedad": "EL",
       "Ticker": "CENCOSUD",
       "CantCartola": "136229",
@@ -5561,7 +5578,7 @@
       "Estado": "Diferencia +106,000.0"
     },
     {
-      "FechaCartola": "2026-06-23",
+      "FechaCartola": "2026-06-24",
       "Sociedad": "EL",
       "Ticker": "CFIARRAA-E",
       "CantCartola": "0",
@@ -5570,7 +5587,7 @@
       "Estado": "Solo en facturas"
     },
     {
-      "FechaCartola": "2026-06-23",
+      "FechaCartola": "2026-06-24",
       "Sociedad": "EL",
       "Ticker": "CFIMRCLP",
       "CantCartola": "0",
@@ -5579,7 +5596,7 @@
       "Estado": "Solo en facturas"
     },
     {
-      "FechaCartola": "2026-06-23",
+      "FechaCartola": "2026-06-24",
       "Sociedad": "EL",
       "Ticker": "CHILE",
       "CantCartola": "0",
@@ -5588,7 +5605,7 @@
       "Estado": "OK"
     },
     {
-      "FechaCartola": "2026-06-23",
+      "FechaCartola": "2026-06-24",
       "Sociedad": "EL",
       "Ticker": "COPEC",
       "CantCartola": "21055",
@@ -5597,7 +5614,7 @@
       "Estado": "Solo en cartola"
     },
     {
-      "FechaCartola": "2026-06-23",
+      "FechaCartola": "2026-06-24",
       "Sociedad": "EL",
       "Ticker": "ENELAM",
       "CantCartola": "7106326",
@@ -5606,7 +5623,7 @@
       "Estado": "Diferencia +13,158,102.0"
     },
     {
-      "FechaCartola": "2026-06-23",
+      "FechaCartola": "2026-06-24",
       "Sociedad": "EL",
       "Ticker": "ENELCHILE",
       "CantCartola": "0",
@@ -5615,7 +5632,7 @@
       "Estado": "OK"
     },
     {
-      "FechaCartola": "2026-06-23",
+      "FechaCartola": "2026-06-24",
       "Sociedad": "EL",
       "Ticker": "FALABELLA",
       "CantCartola": "0",
@@ -5624,7 +5641,7 @@
       "Estado": "OK"
     },
     {
-      "FechaCartola": "2026-06-23",
+      "FechaCartola": "2026-06-24",
       "Sociedad": "EL",
       "Ticker": "ITAUCL",
       "CantCartola": "3801",
@@ -5633,7 +5650,7 @@
       "Estado": "OK"
     },
     {
-      "FechaCartola": "2026-06-23",
+      "FechaCartola": "2026-06-24",
       "Sociedad": "EL",
       "Ticker": "LTM",
       "CantCartola": "0",
@@ -5642,7 +5659,7 @@
       "Estado": "Solo en facturas"
     },
     {
-      "FechaCartola": "2026-06-23",
+      "FechaCartola": "2026-06-24",
       "Sociedad": "EL",
       "Ticker": "MALLPLAZA",
       "CantCartola": "0",
@@ -5651,7 +5668,7 @@
       "Estado": "OK"
     },
     {
-      "FechaCartola": "2026-06-23",
+      "FechaCartola": "2026-06-24",
       "Sociedad": "EL",
       "Ticker": "SQM-B",
       "CantCartola": "0",
@@ -5660,7 +5677,7 @@
       "Estado": "Solo en facturas"
     },
     {
-      "FechaCartola": "2026-06-23",
+      "FechaCartola": "2026-06-24",
       "Sociedad": "FIP",
       "Ticker": "CHILE",
       "CantCartola": "0",
