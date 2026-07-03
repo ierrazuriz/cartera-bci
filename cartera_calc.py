@@ -1,6 +1,6 @@
 """
 Lógica de cálculo de cartera — generado automáticamente desde cartola BCI.
-Posiciones base: cartola 26/06/2026.
+Posiciones base: cartola 03/07/2026.
 NO editar manualmente — se sobreescribe con cada sync.
 """
 from datetime import date
@@ -8,17 +8,18 @@ from datetime import date
 # ── EL LTDA (76.677.950-6) ─────────────────────────────────────────────────────
 # (nemotécnico, nombre, cant_activo, cant_pasivo, precio_cartola)
 EL_ACCIONES = [
-    ("ABC", "Abc S.A.", 23_210_430, 0, 10.5),
-    ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 329.0),
-    ("CENCOSUD", "Cencosud S.A.", 136_229, 0, 2123.0),
-    ("COPEC", "Empresas Copec S.A.", 21_055, 0, 5802.0),
-    ("ENELAM", "Enel Americas S.A.", 7_106_326, 0, 81.51),
-    ("ITAUCL", "Banco Itau Chile", 3_801, 0, 18400.0),
+    ("ABC", "Abc S.A.", 23_210_430, 0, 10.7),
+    ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 330.87),
+    ("CENCOSUD", "Cencosud S.A.", 136_229, 0, 2073.0),
+    ("COPEC", "Empresas Copec S.A.", 21_055, 0, 5834.7),
+    ("ENELAM", "Enel Americas S.A.", 7_106_326, 0, 82.9),
+    ("ITAUCL", "Banco Itau Chile", 3_801, 0, 19380.0),
+    ("LTM", "Latam Airlines Group S.A.", 8_000_000, 0, 26.0),
 ]
 
 # (nemotécnico, nombre, cantidad, precio_compra, precio_cartola)
 EL_CFI = [
-    ("CFIARRAA-E", "Cfiarraa-E", 4_187, 48138.424, 52824.91),
+    ("CFIARRAA-E", "Cfiarraa-E", 4_187, 48138.424, 52851.7072),
     ("CFITRIPT-E", "Cfitript-E", 1_471, 13280.761, 14000.0),
 ]
 
@@ -28,37 +29,42 @@ EL_SIM = [
 
 # ── EMF SPA (77.209.686-0) ──────────────────────────────────────────────────────
 EMF_CFI = [
-    ("CFIARRAA-E", "Cfiarraa-E", 500, 47154.0, 52824.91),
+    ("CFIARRAA-E", "Cfiarraa-E", 500, 47154.0, 52851.7072),
 ]
 
 # (folio, tipo C/V, usd, tc_fwd, f_inicio, f_termino)
 EMF_FWD = [
-    (1848634, "C", 500_000, 915.02, date(2026,6,25), date(2026,7,1)),
-    (1848637, "V", 500_000, 919.2, date(2026,6,25), date(2026,7,1)),
+    (1849472, "C", 500_000, 926.1, date(2026,7,1), date(2026,7,6)),
+    (1849475, "C", 500_000, 926.1, date(2026,7,1), date(2026,7,6)),
+    (1849739, "C", 500_000, 921.35, date(2026,7,2), date(2026,7,7)),
+    (1849741, "V", 500_000, 922.9, date(2026,7,2), date(2026,7,7)),
     (1845333, "V", 500_000, 912.27, date(2026,6,8), date(2026,7,17)),
+    (1848386, "V", 500_000, 919.12, date(2026,6,24), date(2026,7,17)),
     (1846616, "V", 500_000, 888.13, date(2026,6,15), date(2026,8,6)),
     (1847423, "V", 500_000, 894.22, date(2026,6,18), date(2026,8,6)),
-    (1848386, "V", 500_000, 919.12, date(2026,6,24), date(2026,7,17)),
+    (1849477, "V", 500_000, 927.77, date(2026,7,1), date(2026,7,6)),
+    (1849473, "V", 500_000, 927.8, date(2026,7,1), date(2026,7,6)),
 ]
 
-# Cajas (saldo cartola 26/06/2026)
+# Cajas (saldo cartola 03/07/2026)
 CAJA_EL       = 0
-OPS_LIQUIDAR  = 0
-CAJA_EMF      = 86_306_120
+OPS_LIQUIDAR  = -207_456_396
+CAJA_EMF      = 88_396_120
 
-# Precios base (cartola 26/06/2026)
+# Precios base (cartola 03/07/2026)
 PRECIOS_DEFAULT = {
-    "UF": 40809.44,
-    "USD": 916.97,
-    "EUR": 1043.08,
-    "ABC": 10.5,
-    "AGUAS-A": 329.0,
-    "CENCOSUD": 2123.0,
-    "CFIARRAA-E": 52824.91,
+    "UF": 40828.47,
+    "USD": 921.7,
+    "EUR": 1053.85,
+    "ABC": 10.7,
+    "AGUAS-A": 330.87,
+    "CENCOSUD": 2073.0,
+    "CFIARRAA-E": 52851.7072,
     "CFITRIPT-E": 14000.0,
-    "COPEC": 5802.0,
-    "ENELAM": 81.51,
-    "ITAUCL": 18400.0,
+    "COPEC": 5834.7,
+    "ENELAM": 82.9,
+    "ITAUCL": 19380.0,
+    "LTM": 26.0,
 }
 
 INSTRUMENTOS_META = {
@@ -68,6 +74,7 @@ INSTRUMENTOS_META = {
     "COPEC": {"nombre": "Empresas Copec S.A.", "tipo": "accion", "fmt": ".4f"},
     "ENELAM": {"nombre": "Enel Americas S.A.", "tipo": "accion", "fmt": ".4f"},
     "ITAUCL": {"nombre": "Banco Itau Chile", "tipo": "accion", "fmt": ".4f"},
+    "LTM": {"nombre": "Latam Airlines Group S.A.", "tipo": "accion", "fmt": ".4f"},
     "CFIARRAA-E": {"nombre": "Cfiarraa-E", "tipo": "cfi", "fmt": ".4f"},
     "CFITRIPT-E": {"nombre": "Cfitript-E", "tipo": "cfi", "fmt": ".4f"},
 }
