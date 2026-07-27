@@ -1,6 +1,6 @@
 """
 Lógica de cálculo de cartera — generado automáticamente desde cartola BCI.
-Posiciones base: cartola 24/07/2026.
+Posiciones base: cartola 27/07/2026.
 NO editar manualmente — se sobreescribe con cada sync.
 """
 from datetime import date
@@ -8,14 +8,14 @@ from datetime import date
 # ── EL LTDA (76.677.950-6) ─────────────────────────────────────────────────────
 # (nemotécnico, nombre, cant_activo, cant_pasivo, precio_cartola)
 EL_ACCIONES = [
-    ("ABC", "Abc S.A.", 23_210_430, 0, 9.51),
-    ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 334.0),
-    ("CENCOSUD", "Cencosud S.A.", 136_229, 0, 1968.0),
+    ("ABC", "Abc S.A.", 23_210_430, 0, 9.2),
+    ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 338.0),
+    ("CENCOSUD", "Cencosud S.A.", 136_229, 0, 1958.0),
 ]
 
 # (nemotécnico, nombre, cantidad, precio_compra, precio_cartola)
 EL_CFI = [
-    ("CFIARRAA-E", "Cfiarraa-E", 4_132, 48151.1358, 53646.158),
+    ("CFIARRAA-E", "Cfiarraa-E", 4_132, 48151.1358, 53879.6793),
     ("CFITRIPT-E", "Cfitript-E", 1_471, 13280.761, 14000.0),
 ]
 
@@ -25,7 +25,7 @@ EL_SIM = [
 
 # ── EMF SPA (77.209.686-0) ──────────────────────────────────────────────────────
 EMF_CFI = [
-    ("CFIARRAA-E", "Cfiarraa-E", 500, 47154.0, 53646.158),
+    ("CFIARRAA-E", "Cfiarraa-E", 500, 47154.0, 53879.6793),
 ]
 
 # (folio, tipo C/V, usd, tc_fwd, f_inicio, f_termino)
@@ -36,20 +36,20 @@ EMF_FWD = [
     (1852208, "V", 500_000, 933.3, date(2026,7,20), date(2026,8,6)),
 ]
 
-# Cajas (saldo cartola 24/07/2026)
-CAJA_EL       = 0
+# Cajas (saldo cartola 27/07/2026)
+CAJA_EL       = 1_750_442_495
 OPS_LIQUIDAR  = 0
 CAJA_EMF      = 82_601_120
 
-# Precios base (cartola 24/07/2026)
+# Precios base (cartola 27/07/2026)
 PRECIOS_DEFAULT = {
     "UF": 40844.79,
-    "USD": 946.24,
-    "EUR": 1076.37,
-    "ABC": 9.51,
-    "AGUAS-A": 334.0,
-    "CENCOSUD": 1968.0,
-    "CFIARRAA-E": 53646.158,
+    "USD": 946.14,
+    "EUR": 1075.65,
+    "ABC": 9.2,
+    "AGUAS-A": 338.0,
+    "CENCOSUD": 1958.0,
+    "CFIARRAA-E": 53879.6793,
     "CFITRIPT-E": 14000.0,
 }
 
