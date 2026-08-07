@@ -1,6 +1,6 @@
 """
 Lógica de cálculo de cartera — generado automáticamente desde cartola BCI.
-Posiciones base: cartola 27/07/2026.
+Posiciones base: cartola 07/08/2026.
 NO editar manualmente — se sobreescribe con cada sync.
 """
 from datetime import date
@@ -8,14 +8,15 @@ from datetime import date
 # ── EL LTDA (76.677.950-6) ─────────────────────────────────────────────────────
 # (nemotécnico, nombre, cant_activo, cant_pasivo, precio_cartola)
 EL_ACCIONES = [
-    ("ABC", "Abc S.A.", 23_210_430, 0, 9.2),
-    ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 338.0),
-    ("CENCOSUD", "Cencosud S.A.", 136_229, 0, 1958.0),
+    ("ABC", "Abc S.A.", 23_210_430, 0, 9.5),
+    ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 341.48),
+    ("CENCOSUD", "Cencosud S.A.", 136_229, 0, 2060.0),
+    ("CMPC", "Empresas Cmpc S.A.", 200_000, 0, 1030.0),
 ]
 
 # (nemotécnico, nombre, cantidad, precio_compra, precio_cartola)
 EL_CFI = [
-    ("CFIARRAA-E", "Cfiarraa-E", 4_132, 48151.1358, 53879.6793),
+    ("CFIARRAA-E", "Cfiarraa-E", 4_132, 48151.1358, 53823.0),
     ("CFITRIPT-E", "Cfitript-E", 1_471, 13280.761, 14000.0),
 ]
 
@@ -25,38 +26,37 @@ EL_SIM = [
 
 # ── EMF SPA (77.209.686-0) ──────────────────────────────────────────────────────
 EMF_CFI = [
-    ("CFIARRAA-E", "Cfiarraa-E", 500, 47154.0, 53879.6793),
+    ("CFIARRAA-E", "Cfiarraa-E", 500, 47154.0, 53823.0),
 ]
 
 # (folio, tipo C/V, usd, tc_fwd, f_inicio, f_termino)
 EMF_FWD = [
-    (1846616, "V", 500_000, 888.13, date(2026,6,15), date(2026,8,6)),
-    (1847423, "V", 500_000, 894.22, date(2026,6,18), date(2026,8,6)),
-    (1850886, "V", 500_000, 936.25, date(2026,7,8), date(2026,8,6)),
-    (1852208, "V", 500_000, 933.3, date(2026,7,20), date(2026,8,6)),
+    (1855435, "V", 1_000_000, 914.1, date(2026,8,6), date(2026,9,7)),
 ]
 
-# Cajas (saldo cartola 27/07/2026)
-CAJA_EL       = 1_750_442_495
-OPS_LIQUIDAR  = 0
-CAJA_EMF      = 82_601_120
+# Cajas (saldo cartola 07/08/2026)
+CAJA_EL       = 0
+OPS_LIQUIDAR  = -206_267_725
+CAJA_EMF      = 70_196_120
 
-# Precios base (cartola 27/07/2026)
+# Precios base (cartola 07/08/2026)
 PRECIOS_DEFAULT = {
     "UF": 40844.79,
-    "USD": 946.14,
-    "EUR": 1075.65,
-    "ABC": 9.2,
-    "AGUAS-A": 338.0,
-    "CENCOSUD": 1958.0,
-    "CFIARRAA-E": 53879.6793,
+    "USD": 913.86,
+    "EUR": 1053.08,
+    "ABC": 9.5,
+    "AGUAS-A": 341.48,
+    "CENCOSUD": 2060.0,
+    "CFIARRAA-E": 53823.0,
     "CFITRIPT-E": 14000.0,
+    "CMPC": 1030.0,
 }
 
 INSTRUMENTOS_META = {
     "ABC": {"nombre": "Abc S.A.", "tipo": "accion", "fmt": ".4f"},
     "AGUAS-A": {"nombre": "Aguas Andinas S.A.", "tipo": "accion", "fmt": ".4f"},
     "CENCOSUD": {"nombre": "Cencosud S.A.", "tipo": "accion", "fmt": ".4f"},
+    "CMPC": {"nombre": "Empresas Cmpc S.A.", "tipo": "accion", "fmt": ".4f"},
     "CFIARRAA-E": {"nombre": "Cfiarraa-E", "tipo": "cfi", "fmt": ".4f"},
     "CFITRIPT-E": {"nombre": "Cfitript-E", "tipo": "cfi", "fmt": ".4f"},
 }
