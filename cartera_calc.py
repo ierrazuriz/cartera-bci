@@ -1,6 +1,6 @@
 """
 Lógica de cálculo de cartera — generado automáticamente desde cartola BCI.
-Posiciones base: cartola 25/08/2026.
+Posiciones base: cartola 28/08/2026.
 NO editar manualmente — se sobreescribe con cada sync.
 """
 from datetime import date
@@ -9,9 +9,10 @@ from datetime import date
 # (nemotécnico, nombre, cant_activo, cant_pasivo, precio_cartola)
 EL_ACCIONES = [
     ("ABC", "Abc S.A.", 23_210_430, 0, 11.0),
-    ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 330.0),
-    ("CENCOSUD", "Cencosud S.A.", 136_229, 0, 2128.0),
-    ("CMPC", "Empresas Cmpc S.A.", 200_000, 0, 1028.0),
+    ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 329.0),
+    ("CENCOSUD", "Cencosud S.A.", 136_229, 0, 2079.0),
+    ("CMPC", "Empresas Cmpc S.A.", 150_000, 0, 1080.0),
+    ("ENELAM", "Enel Americas S.A.", 0, 0, 89.0),
 ]
 
 # (nemotécnico, nombre, cantidad, precio_compra, precio_cartola)
@@ -31,25 +32,27 @@ EMF_CFI = [
 
 # (folio, tipo C/V, usd, tc_fwd, f_inicio, f_termino)
 EMF_FWD = [
+    (1858612, "C", 500_000, 910.11, date(2026,8,25), date(2026,9,7)),
     (1855435, "V", 1_000_000, 914.1, date(2026,8,6), date(2026,9,7)),
 ]
 
-# Cajas (saldo cartola 25/08/2026)
-CAJA_EL       = 1_547_525_160
-OPS_LIQUIDAR  = 0
+# Cajas (saldo cartola 28/08/2026)
+CAJA_EL       = 0
+OPS_LIQUIDAR  = 320_155_662
 CAJA_EMF      = 71_046_120
 
-# Precios base (cartola 25/08/2026)
+# Precios base (cartola 28/08/2026)
 PRECIOS_DEFAULT = {
-    "UF": 40865.87,
-    "USD": 914.64,
-    "EUR": 1066.64,
+    "UF": 40869.82,
+    "USD": 925.25,
+    "EUR": 1077.75,
     "ABC": 11.0,
-    "AGUAS-A": 330.0,
-    "CENCOSUD": 2128.0,
+    "AGUAS-A": 329.0,
+    "CENCOSUD": 2079.0,
     "CFIARRAA-E": 55051.0,
     "CFITRIPT-E": 14000.0,
-    "CMPC": 1028.0,
+    "CMPC": 1080.0,
+    "ENELAM": 89.0,
 }
 
 INSTRUMENTOS_META = {
@@ -57,6 +60,7 @@ INSTRUMENTOS_META = {
     "AGUAS-A": {"nombre": "Aguas Andinas S.A.", "tipo": "accion", "fmt": ".4f"},
     "CENCOSUD": {"nombre": "Cencosud S.A.", "tipo": "accion", "fmt": ".4f"},
     "CMPC": {"nombre": "Empresas Cmpc S.A.", "tipo": "accion", "fmt": ".4f"},
+    "ENELAM": {"nombre": "Enel Americas S.A.", "tipo": "accion", "fmt": ".4f"},
     "CFIARRAA-E": {"nombre": "Cfiarraa-E", "tipo": "cfi", "fmt": ".4f"},
     "CFITRIPT-E": {"nombre": "Cfitript-E", "tipo": "cfi", "fmt": ".4f"},
 }

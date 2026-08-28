@@ -1,5 +1,5 @@
 {
-  "sync_at": "2026-08-25T09:16:33.624843",
+  "sync_at": "2026-08-28T09:15:35.035149",
   "movimientos": [
     {
       "Fecha": "2026-04-01",
@@ -2954,6 +2954,40 @@
       "PrecioUnit": "1052.799985",
       "Cantidad": "26293",
       "Monto": "27681270",
+      "Comision": "",
+      "IVA": "",
+      "Total": "",
+      "ValorPagar": ""
+    },
+    {
+      "Fecha": "2026-08-27",
+      "FechaPago": "2026-08-31",
+      "N°Factura": "3982854",
+      "Sociedad": "EL",
+      "Ticker": "CMPC",
+      "Tipo": "VENTA",
+      "TipoActivo": "Acciones Nacionales",
+      "APB": "Sí",
+      "PrecioUnit": "1066",
+      "Cantidad": "50000",
+      "Monto": "53300000",
+      "Comision": "",
+      "IVA": "",
+      "Total": "",
+      "ValorPagar": ""
+    },
+    {
+      "Fecha": "2026-08-27",
+      "FechaPago": "2026-08-31",
+      "N°Factura": "3982854",
+      "Sociedad": "EL",
+      "Ticker": "ENELAM",
+      "Tipo": "VENTA",
+      "TipoActivo": "Acciones Nacionales",
+      "APB": "Sí",
+      "PrecioUnit": "88.989999",
+      "Cantidad": "3000000",
+      "Monto": "266969998",
       "Comision": "",
       "IVA": "",
       "Total": "",
@@ -6868,11 +6902,56 @@
       "FechaPago": "2026-08-13",
       "TipoOperacion": "Compensación",
       "FechaContrato": "2024-11-12"
+    },
+    {
+      "Fecha": "25 Aug 202",
+      "Sociedad": "EMF",
+      "FolioOp": "1858612",
+      "Nominal": "500000",
+      "MonedaPrimaria": "USD",
+      "MonedaSecundaria": "CLP",
+      "TipoCliente": "Compra",
+      "PrecioPac": "910.11",
+      "FechaInicio": "2026-08-25",
+      "FechaVencimiento": "2026-09-07",
+      "FechaPago": "2026-09-08",
+      "TipoOperacion": "Compensación",
+      "FechaContrato": "2024-11-12"
+    },
+    {
+      "Fecha": "25 Aug 202",
+      "Sociedad": "FIP",
+      "FolioOp": "1858611",
+      "Nominal": "500000",
+      "MonedaPrimaria": "USD",
+      "MonedaSecundaria": "CLP",
+      "TipoCliente": "Compra",
+      "PrecioPac": "910.11",
+      "FechaInicio": "2026-08-25",
+      "FechaVencimiento": "2026-09-07",
+      "FechaPago": "2026-09-08",
+      "TipoOperacion": "Compensación",
+      "FechaContrato": "2024-11-21"
+    },
+    {
+      "Fecha": "25 Aug 202",
+      "Sociedad": "FIP",
+      "FolioOp": "1858610",
+      "Nominal": "500000",
+      "MonedaPrimaria": "USD",
+      "MonedaSecundaria": "CLP",
+      "TipoCliente": "Compra",
+      "PrecioPac": "910.11",
+      "FechaInicio": "2026-08-25",
+      "FechaVencimiento": "2026-09-07",
+      "FechaPago": "2026-09-08",
+      "TipoOperacion": "Compensación",
+      "FechaContrato": "2024-11-21"
     }
   ],
   "comparacion": [
     {
-      "FechaCartola": "2026-08-25",
+      "FechaCartola": "2026-08-28",
       "Sociedad": "14.534.289-9",
       "Ticker": "CMPC",
       "CantCartola": "801869",
@@ -6881,7 +6960,7 @@
       "Estado": "Solo en cartola"
     },
     {
-      "FechaCartola": "2026-08-25",
+      "FechaCartola": "2026-08-28",
       "Sociedad": "14.534.289-9",
       "Ticker": "FALABELLA",
       "CantCartola": "0",
@@ -6890,7 +6969,7 @@
       "Estado": "OK"
     },
     {
-      "FechaCartola": "2026-08-25",
+      "FechaCartola": "2026-08-28",
       "Sociedad": "14.534.289-9",
       "Ticker": "LTM",
       "CantCartola": "10000000",
@@ -6899,7 +6978,7 @@
       "Estado": "Solo en cartola"
     },
     {
-      "FechaCartola": "2026-08-25",
+      "FechaCartola": "2026-08-28",
       "Sociedad": "14.534.289-9",
       "Ticker": "SQM-B",
       "CantCartola": "0",
@@ -6908,7 +6987,7 @@
       "Estado": "OK"
     },
     {
-      "FechaCartola": "2026-08-25",
+      "FechaCartola": "2026-08-28",
       "Sociedad": "EL",
       "Ticker": "ABC",
       "CantCartola": "23210430",
@@ -6917,7 +6996,7 @@
       "Estado": "Solo en cartola"
     },
     {
-      "FechaCartola": "2026-08-25",
+      "FechaCartola": "2026-08-28",
       "Sociedad": "EL",
       "Ticker": "AGUAS-A",
       "CantCartola": "1819069",
@@ -6926,7 +7005,7 @@
       "Estado": "Diferencia +2,069,069.0"
     },
     {
-      "FechaCartola": "2026-08-25",
+      "FechaCartola": "2026-08-28",
       "Sociedad": "EL",
       "Ticker": "BCI",
       "CantCartola": "0",
@@ -6935,7 +7014,7 @@
       "Estado": "OK"
     },
     {
-      "FechaCartola": "2026-08-25",
+      "FechaCartola": "2026-08-28",
       "Sociedad": "EL",
       "Ticker": "CENCOSUD",
       "CantCartola": "136229",
@@ -6944,7 +7023,7 @@
       "Estado": "Diferencia +106,000.0"
     },
     {
-      "FechaCartola": "2026-08-25",
+      "FechaCartola": "2026-08-28",
       "Sociedad": "EL",
       "Ticker": "CFIARRAA-E",
       "CantCartola": "0",
@@ -6953,7 +7032,7 @@
       "Estado": "Solo en facturas"
     },
     {
-      "FechaCartola": "2026-08-25",
+      "FechaCartola": "2026-08-28",
       "Sociedad": "EL",
       "Ticker": "CFIMRCLP",
       "CantCartola": "0",
@@ -6962,7 +7041,7 @@
       "Estado": "Solo en facturas"
     },
     {
-      "FechaCartola": "2026-08-25",
+      "FechaCartola": "2026-08-28",
       "Sociedad": "EL",
       "Ticker": "CHILE",
       "CantCartola": "0",
@@ -6971,16 +7050,16 @@
       "Estado": "OK"
     },
     {
-      "FechaCartola": "2026-08-25",
+      "FechaCartola": "2026-08-28",
       "Sociedad": "EL",
       "Ticker": "CMPC",
-      "CantCartola": "200000",
-      "CantFacturas": "200000",
+      "CantCartola": "150000",
+      "CantFacturas": "150000",
       "Diferencia": "0",
       "Estado": "OK"
     },
     {
-      "FechaCartola": "2026-08-25",
+      "FechaCartola": "2026-08-28",
       "Sociedad": "EL",
       "Ticker": "COPEC",
       "CantCartola": "0",
@@ -6989,16 +7068,16 @@
       "Estado": "Solo en facturas"
     },
     {
-      "FechaCartola": "2026-08-25",
+      "FechaCartola": "2026-08-28",
       "Sociedad": "EL",
       "Ticker": "ENELAM",
       "CantCartola": "0",
-      "CantFacturas": "-13158102",
-      "Diferencia": "13158102",
+      "CantFacturas": "-16158102",
+      "Diferencia": "16158102",
       "Estado": "Solo en facturas"
     },
     {
-      "FechaCartola": "2026-08-25",
+      "FechaCartola": "2026-08-28",
       "Sociedad": "EL",
       "Ticker": "ENELCHILE",
       "CantCartola": "0",
@@ -7007,7 +7086,7 @@
       "Estado": "OK"
     },
     {
-      "FechaCartola": "2026-08-25",
+      "FechaCartola": "2026-08-28",
       "Sociedad": "EL",
       "Ticker": "FALABELLA",
       "CantCartola": "0",
@@ -7016,7 +7095,7 @@
       "Estado": "OK"
     },
     {
-      "FechaCartola": "2026-08-25",
+      "FechaCartola": "2026-08-28",
       "Sociedad": "EL",
       "Ticker": "ITAUCL",
       "CantCartola": "0",
@@ -7025,7 +7104,7 @@
       "Estado": "OK"
     },
     {
-      "FechaCartola": "2026-08-25",
+      "FechaCartola": "2026-08-28",
       "Sociedad": "EL",
       "Ticker": "LTM",
       "CantCartola": "0",
@@ -7034,7 +7113,7 @@
       "Estado": "Solo en facturas"
     },
     {
-      "FechaCartola": "2026-08-25",
+      "FechaCartola": "2026-08-28",
       "Sociedad": "EL",
       "Ticker": "MALLPLAZA",
       "CantCartola": "0",
@@ -7043,7 +7122,7 @@
       "Estado": "OK"
     },
     {
-      "FechaCartola": "2026-08-25",
+      "FechaCartola": "2026-08-28",
       "Sociedad": "EL",
       "Ticker": "SQM-B",
       "CantCartola": "0",
@@ -7052,7 +7131,7 @@
       "Estado": "Solo en facturas"
     },
     {
-      "FechaCartola": "2026-08-25",
+      "FechaCartola": "2026-08-28",
       "Sociedad": "FIP",
       "Ticker": "CHILE",
       "CantCartola": "0",
