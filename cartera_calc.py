@@ -1,6 +1,6 @@
 """
 Lógica de cálculo de cartera — generado automáticamente desde cartola BCI.
-Posiciones base: cartola 28/08/2026.
+Posiciones base: cartola 03/09/2026.
 NO editar manualmente — se sobreescribe con cada sync.
 """
 from datetime import date
@@ -8,16 +8,15 @@ from datetime import date
 # ── EL LTDA (76.677.950-6) ─────────────────────────────────────────────────────
 # (nemotécnico, nombre, cant_activo, cant_pasivo, precio_cartola)
 EL_ACCIONES = [
-    ("ABC", "Abc S.A.", 23_210_430, 0, 11.0),
-    ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 329.0),
-    ("CENCOSUD", "Cencosud S.A.", 136_229, 0, 2079.0),
-    ("CMPC", "Empresas Cmpc S.A.", 150_000, 0, 1080.0),
-    ("ENELAM", "Enel Americas S.A.", 0, 0, 89.0),
+    ("ABC", "Abc S.A.", 23_210_430, 0, 10.02),
+    ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 328.6),
+    ("CENCOSUD", "Cencosud S.A.", 136_229, 0, 2034.9),
+    ("CMPC", "Empresas Cmpc S.A.", 150_000, 0, 1060.0),
 ]
 
 # (nemotécnico, nombre, cantidad, precio_compra, precio_cartola)
 EL_CFI = [
-    ("CFIARRAA-E", "Cfiarraa-E", 4_132, 48151.1358, 55051.0),
+    ("CFIARRAA-E", "Cfiarraa-E", 4_132, 48151.1358, 55453.0),
     ("CFITRIPT-E", "Cfitript-E", 1_471, 13280.761, 14000.0),
 ]
 
@@ -27,32 +26,32 @@ EL_SIM = [
 
 # ── EMF SPA (77.209.686-0) ──────────────────────────────────────────────────────
 EMF_CFI = [
-    ("CFIARRAA-E", "Cfiarraa-E", 500, 47154.0, 55051.0),
+    ("CFIARRAA-E", "Cfiarraa-E", 500, 47154.0, 55453.0),
 ]
 
 # (folio, tipo C/V, usd, tc_fwd, f_inicio, f_termino)
 EMF_FWD = [
     (1858612, "C", 500_000, 910.11, date(2026,8,25), date(2026,9,7)),
+    (1859874, "V", 500_000, 938.76, date(2026,9,1), date(2026,9,8)),
     (1855435, "V", 1_000_000, 914.1, date(2026,8,6), date(2026,9,7)),
 ]
 
-# Cajas (saldo cartola 28/08/2026)
-CAJA_EL       = 0
-OPS_LIQUIDAR  = 320_155_662
+# Cajas (saldo cartola 03/09/2026)
+CAJA_EL       = 1_608_333_271
+OPS_LIQUIDAR  = 733_307
 CAJA_EMF      = 71_046_120
 
-# Precios base (cartola 28/08/2026)
+# Precios base (cartola 03/09/2026)
 PRECIOS_DEFAULT = {
-    "UF": 40869.82,
-    "USD": 925.25,
-    "EUR": 1077.75,
-    "ABC": 11.0,
-    "AGUAS-A": 329.0,
-    "CENCOSUD": 2079.0,
-    "CFIARRAA-E": 55051.0,
+    "UF": 40877.73,
+    "USD": 936.32,
+    "EUR": 1084.83,
+    "ABC": 10.02,
+    "AGUAS-A": 328.6,
+    "CENCOSUD": 2034.9,
+    "CFIARRAA-E": 55453.0,
     "CFITRIPT-E": 14000.0,
-    "CMPC": 1080.0,
-    "ENELAM": 89.0,
+    "CMPC": 1060.0,
 }
 
 INSTRUMENTOS_META = {
@@ -60,7 +59,6 @@ INSTRUMENTOS_META = {
     "AGUAS-A": {"nombre": "Aguas Andinas S.A.", "tipo": "accion", "fmt": ".4f"},
     "CENCOSUD": {"nombre": "Cencosud S.A.", "tipo": "accion", "fmt": ".4f"},
     "CMPC": {"nombre": "Empresas Cmpc S.A.", "tipo": "accion", "fmt": ".4f"},
-    "ENELAM": {"nombre": "Enel Americas S.A.", "tipo": "accion", "fmt": ".4f"},
     "CFIARRAA-E": {"nombre": "Cfiarraa-E", "tipo": "cfi", "fmt": ".4f"},
     "CFITRIPT-E": {"nombre": "Cfitript-E", "tipo": "cfi", "fmt": ".4f"},
 }
