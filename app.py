@@ -26,6 +26,7 @@ from cartera_calc import (
     cargar_datos_cartola,
     PRECIOS_DEFAULT, INSTRUMENTOS_META,
 )
+import launchpad_data as lpd
 
 app = Flask(__name__)
 
@@ -307,6 +308,46 @@ def api_estado():
         },
         "total_clp": el["patrimonio_clp"] + emf["patrimonio_clp"],
     })
+
+
+@app.route("/launchpad")
+def launchpad():
+    """Launchpad tipo Bloomberg, con datos de fuentes gratuitas."""
+    return render_template("launchpad.html")
+
+
+@app.route("/api/launchpad/quotes")
+def api_launchpad_quotes():
+    data = lpd.cached("quotes", 15, lpd.fetch_all_quotes)
+    return jsonify(data or {})
+
+
+@app.route("/api/launchpad/chile")
+def api_launchpad_chile():
+    data = lpd.cached("chile", 300, lpd.fetch_mindicador)
+    return jsonify(data or {})
+
+
+@app.route("/api/launchpad/news")
+def api_launchpad_news():
+    data = lpd.cached("news", 300, lpd.fetch_news_bundle)
+    return jsonify(data or {"chile": [], "global": []})
+
+
+@app.route("/api/launchpad/calendar")
+def api_launchpad_calendar():
+    data = lpd.cached("calendar", 1800, lpd.fetch_calendar)
+    return jsonify(data or [])
+
+
+@app.route("/api/launchpad/chart/<key>")
+def api_launchpad_chart(key):
+    entry = lpd.CHARTS.get(key)
+    if not entry:
+        return jsonify({"ok": False, "error": "chart desconocido"}), 404
+    _, symbol = entry
+    data = lpd.cached(f"chart:{key}", 60, lpd.fetch_chart, symbol, "1d", "5m")
+    return jsonify(data or {"ok": False, "points": []})
 
 
 @app.route("/facturas")

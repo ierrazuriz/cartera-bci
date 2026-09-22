@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Launchpad — Cartera BCI</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#000000;
+    --panel:#050607;
+    --panel-head:#171a1d;
+    --border:#2b2f34;
+    --text:#d7dadd;
+    --dim:#7c8489;
+    --amber:#ff9d00;
+    --green:#22c55e;
+    --red:#ff4d4f;
+    --yellow:#f4d03f;
+    --blue:#4fa3ff;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    background:var(--bg); color:var(--text); margin:0; padding:0;
+    font-family:'Consolas','SFMono-Regular','Menlo','Courier New',monospace;
+    font-size:12px;
+  }
+  a{color:var(--blue); text-decoration:none;}
+  a:hover{text-decoration:underline;}
+
+  .lp-topbar{
+    background:#111417; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:6px 14px;
+  }
+  .lp-topbar .brand{color:var(--amber); font-weight:700; letter-spacing:.5px;}
+  .lp-topbar .nav a{
+    margin-left:14px; color:var(--dim); font-size:11px; padding:3px 8px;
+    border:1px solid var(--border); border-radius:3px;
+  }
+  .lp-topbar .nav a:hover{color:var(--amber); border-color:var(--amber); text-decoration:none;}
+  .lp-topbar .clock-mini{color:var(--dim); font-size:11px;}
+
+  .lp-grid{
+    display:grid; gap:6px; padding:6px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-auto-rows: min-content;
+  }
+
+  .panel{
+    background:var(--panel); border:1px solid var(--border); border-radius:2px;
+    display:flex; flex-direction:column; overflow:hidden;
+  }
+  .panel-head{
+    background:var(--panel-head); border-bottom:1px solid var(--border);
+    padding:4px 8px; display:flex; align-items:center; justify-content:space-between;
+    font-size:10.5px; color:var(--dim); letter-spacing:.4px; text-transform:uppercase;
+  }
+  .panel-head .title{color:#c9cdd1; font-weight:700;}
+  .panel-head .tag{color:var(--amber); font-weight:700; margin-right:6px;}
+  .panel-body{padding:2px 0; overflow-y:auto; max-height:340px;}
+  .panel.tall .panel-body{max-height:520px;}
+  .panel.short .panel-body{max-height:170px;}
+
+  table.qtbl{width:100%; border-collapse:collapse;}
+  table.qtbl td{padding:2px 8px; white-space:nowrap; font-size:12px;}
+  table.qtbl tr{border-bottom:1px solid #14171a;}
+  table.qtbl tr:hover{background:#0d1013;}
+  .lbl{color:#c9cdd1;}
+  .sym{color:var(--dim); font-size:10px;}
+  .px{text-align:right; font-weight:600; color:#fff;}
+  .chg{text-align:right;}
+  .pos{color:var(--green);}
+  .neg{color:var(--red);}
+  .na{color:var(--dim);}
+
+  .charts-panel .panel-body{max-height:none; padding:6px;}
+  .chart-slot{margin-bottom:8px;}
+  .chart-slot .chart-title{font-size:10px; color:var(--dim); margin-bottom:2px; text-transform:uppercase;}
+  .chart-slot canvas{width:100%!important; height:90px!important;}
+
+  .clock-row{display:flex; justify-content:space-around; padding:10px 4px; text-align:center;}
+  .clock-row .city{color:var(--dim); font-size:10px; text-transform:uppercase;}
+  .clock-row .time{color:var(--amber); font-size:20px; font-weight:700; letter-spacing:1px;}
+
+  .news-item{padding:5px 8px; border-bottom:1px solid #14171a; font-size:11.5px;}
+  .news-item a{color:#d7dadd;}
+  .news-item a:hover{color:var(--amber);}
+  .news-item .meta{color:var(--dim); font-size:10px; margin-top:2px;}
+
+  table.caltbl{width:100%; border-collapse:collapse; font-size:11px;}
+  table.caltbl th{
+    position:sticky; top:0; background:var(--panel-head); color:var(--dim);
+    text-align:left; padding:3px 6px; font-weight:600; border-bottom:1px solid var(--border);
+  }
+  table.caltbl td{padding:3px 6px; border-bottom:1px solid #14171a; white-space:nowrap;}
+  .impact-dot{display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:5px;}
+  .impact-High{background:var(--red);}
+  .impact-Medium{background:var(--yellow);}
+  .impact-Low{background:var(--dim);}
+
+  .chile-item{display:flex; justify-content:space-between; padding:5px 10px; border-bottom:1px solid #14171a;}
+  .chile-item .k{color:var(--dim);}
+  .chile-item .v{color:#fff; font-weight:600;}
+
+  .lp-footer{
+    background:#111417; border-top:1px solid var(--border); color:var(--dim);
+    font-size:10.5px; padding:5px 12px; display:flex; justify-content:space-between;
+  }
+  .lp-footer .amber{color:var(--amber);}
+  .empty{color:var(--dim); padding:10px; font-style:italic; font-size:11px;}
+</style>
+</head>
+<body>
+
+<div class="lp-topbar">
+  <div class="brand">⌗ CARTERA BCI — LAUNCHPAD</div>
+  <div class="nav">
+    <a href="{{ url_for('index') }}">Cartera</a>
+    <a href="{{ url_for('facturas') }}">Facturas</a>
+    <span class="clock-mini" id="topbar-clock"></span>
+  </div>
+</div>
+
+<div class="lp-grid">
+
+  <!-- Índices globales -->
+  <div class="panel tall">
+    <div class="panel-head"><span><span class="tag">W1</span><span class="title">Índices Globales</span></span><span id="idx-ts"></span></div>
+    <div class="panel-body"><table class="qtbl"><tbody id="indices-body"></tbody></table></div>
+  </div>
+
+  <!-- Monedas y cripto -->
+  <div class="panel tall">
+    <div class="panel-head"><span><span class="tag">W2</span><span class="title">Monedas &amp; Cripto</span></span></div>
+    <div class="panel-body"><table class="qtbl"><tbody id="fx-body"></tbody></table></div>
+  </div>
+
+  <!-- Futuros -->
+  <div class="panel short">
+    <div class="panel-head"><span><span class="tag">WEIF</span><span class="title">Futuros Índices</span></span></div>
+    <div class="panel-body"><table class="qtbl"><tbody id="futures-body"></tbody></table></div>
+  </div>
+
+  <!-- Commodities -->
+  <div class="panel">
+    <div class="panel-head"><span><span class="tag">CMDT</span><span class="title">Commodities</span></span></div>
+    <div class="panel-body"><table class="qtbl"><tbody id="commod-body"></tbody></table></div>
+  </div>
+
+  <!-- Tasas -->
+  <div class="panel">
+    <div class="panel-head"><span><span class="tag">TASA</span><span class="title">Tasas UST (US Treasury)</span></span></div>
+    <div class="panel-body"><table class="qtbl"><tbody id="rates-body"></tbody></table></div>
+  </div>
+
+  <!-- Chile indicadores -->
+  <div class="panel">
+    <div class="panel-head"><span><span class="tag">CL</span><span class="title">Chile — Indicadores (mindicador.cl)</span></span></div>
+    <div class="panel-body" id="chile-body"><div class="empty">Cargando…</div></div>
+  </div>
+
+  <!-- Reloj mundial -->
+  <div class="panel short">
+    <div class="panel-head"><span><span class="tag">IC</span><span class="title">Reloj Mundial</span></span></div>
+    <div class="panel-body">
+      <div class="clock-row">
+        <div><div class="city">Santiago</div><div class="time" id="clock-scl">--:--:--</div></div>
+        <div><div class="city">New York</div><div class="time" id="clock-nyc">--:--:--</div></div>
+        <div><div class="city">London</div><div class="time" id="clock-lon">--:--:--</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="panel charts-panel tall" style="grid-row: span 2;">
+    <div class="panel-head"><span><span class="tag">G4-G7</span><span class="title">Charts</span></span></div>
+    <div class="panel-body">
+      <div class="chart-slot"><div class="chart-title">G4 · IPSA Index</div><canvas id="chart-g4"></canvas></div>
+      <div class="chart-slot"><div class="chart-title">G5 · INDU Index</div><canvas id="chart-g5"></canvas></div>
+      <div class="chart-slot"><div class="chart-title">G6 · USGG10YR Index</div><canvas id="chart-g6"></canvas></div>
+      <div class="chart-slot"><div class="chart-title">G7 · USGG30YR Index</div><canvas id="chart-g7"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Calendario económico -->
+  <div class="panel tall" style="grid-column: span 2;">
+    <div class="panel-head"><span><span class="tag">ECO</span><span class="title">Calendario Económico (semana)</span></span></div>
+    <div class="panel-body">
+      <table class="caltbl">
+        <thead><tr><th>Fecha</th><th>Hora</th><th>País</th><th>Evento</th><th>Prev.</th><th>Anterior</th><th>Actual</th></tr></thead>
+        <tbody id="calendar-body"><tr><td colspan="7" class="empty">Cargando…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Noticias Chile -->
+  <div class="panel tall">
+    <div class="panel-head"><span><span class="tag">CN</span><span class="title">Noticias — Chile</span></span></div>
+    <div class="panel-body" id="news-chile"><div class="empty">Cargando…</div></div>
+  </div>
+
+  <!-- Noticias Global -->
+  <div class="panel tall">
+    <div class="panel-head"><span><span class="tag">GN</span><span class="title">Noticias — Global</span></span></div>
+    <div class="panel-body" id="news-global"><div class="empty">Cargando…</div></div>
+  </div>
+
+</div>
+
+<div class="lp-footer">
+  <span><span class="amber">Launchpad</span> — Cartera BCI (EL LTDA &amp; EMF SPA)</span>
+  <span>Fuentes: Yahoo Finance · mindicador.cl · ForexFactory · Google News — datos gratuitos, retraso posible</span>
+</div>
+
+<script>
+const fmtPrice = (v) => {
+  if (v === null || v === undefined || Number.isNaN(v)) return 'N/D';
+  const a = Math.abs(v);
+  let dec = 2;
+  if (a !== 0 && a < 10) dec = 4;
+  else if (a < 100) dec = 3;
+  else if (a >= 10000) dec = 0;
+  return v.toLocaleString('en-US', {minimumFractionDigits: dec, maximumFractionDigits: dec});
+};
+const fmtPct = (v) => {
+  if (v === null || v === undefined || Number.isNaN(v)) return '—';
+  const p = v * 100;
+  const sign = p >= 0 ? '+' : '';
+  return `${sign}${p.toFixed(2)}%`;
+};
+const signClass = (v) => (v === null || v === undefined || Number.isNaN(v)) ? 'na' : (v >= 0 ? 'pos' : 'neg');
+const arrow = (v) => (v === null || v === undefined || Number.isNaN(v)) ? '' : (v >= 0 ? '▲ ' : '▼ ');
+
+function renderGroup(tbodyId, group){
+  const tbody = document.getElementById(tbodyId);
+  if (!tbody) return;
+  if (!group){ tbody.innerHTML = '<tr><td class="empty">Sin datos</td></tr>'; return; }
+  let html = '';
+  for (const [label, q] of Object.entries(group)){
+    const cls = signClass(q.change_pct);
+    html += `<tr>
+      <td class="lbl">${label}<br><span class="sym">${q.symbol || ''}</span></td>
+      <td class="px">${fmtPrice(q.price)}</td>
+      <td class="chg ${cls}">${arrow(q.change_pct)}${fmtPct(q.change_pct)}</td>
+    </tr>`;
+  }
+  tbody.innerHTML = html || '<tr><td class="empty">Sin datos</td></tr>';
+}
+
+async function refreshQuotes(){
+  try{
+    const r = await fetch('/api/launchpad/quotes');
+    const data = await r.json();
+    renderGroup('indices-body', data.indices);
+    renderGroup('fx-body', data.fx);
+    renderGroup('futures-body', data.futures);
+    renderGroup('commod-body', data.commodities);
+    renderGroup('rates-body', data.rates);
+    const ts = document.getElementById('idx-ts');
+    if (ts && data.ts) ts.textContent = new Date(data.ts * 1000).toLocaleTimeString('es-CL');
+  }catch(e){ console.error('quotes', e); }
+}
+
+async function refreshChile(){
+  try{
+    const r = await fetch('/api/launchpad/chile');
+    const data = await r.json();
+    const box = document.getElementById('chile-body');
+    const entries = Object.values(data || {});
+    if (!entries.length){ box.innerHTML = '<div class="empty">Sin datos</div>'; return; }
+    box.innerHTML = entries.map(e => `
+      <div class="chile-item">
+        <span class="k">${e.nombre || ''} <span class="sym">(${e.fecha ? new Date(e.fecha).toLocaleDateString('es-CL') : ''})</span></span>
+        <span class="v">${typeof e.valor === 'number' ? e.valor.toLocaleString('es-CL', {maximumFractionDigits: 2}) : e.valor} ${e.unidad ? '' : ''}</span>
+      </div>`).join('');
+  }catch(e){ console.error('chile', e); }
+}
+
+function newsItemHtml(n){
+  let when = '';
+  try{ when = new Date(n.pub).toLocaleString('es-CL', {dateStyle:'short', timeStyle:'short'}); }catch(_){ when = n.pub || ''; }
+  return `<div class="news-item">
+    <a href="${n.link}" target="_blank" rel="noopener">${n.title}</a>
+    <div class="meta">${n.source || ''} · ${when}</div>
+  </div>`;
+}
+
+async function refreshNews(){
+  try{
+    const r = await fetch('/api/launchpad/news');
+    const data = await r.json();
+    const chile = document.getElementById('news-chile');
+    const global = document.getElementById('news-global');
+    chile.innerHTML = (data.chile && data.chile.length) ? data.chile.map(newsItemHtml).join('') : '<div class="empty">Sin noticias</div>';
+    global.innerHTML = (data.global && data.global.length) ? data.global.map(newsItemHtml).join('') : '<div class="empty">Sin noticias</div>';
+  }catch(e){ console.error('news', e); }
+}
+
+async function refreshCalendar(){
+  try{
+    const r = await fetch('/api/launchpad/calendar');
+    const data = await r.json();
+    const tbody = document.getElementById('calendar-body');
+    if (!data || !data.length){ tbody.innerHTML = '<tr><td colspan="7" class="empty">Sin datos</td></tr>'; return; }
+    tbody.innerHTML = data.slice(0, 60).map(ev => {
+      let d = null;
+      try{ d = new Date(ev.date); }catch(_){}
+      const fecha = d ? d.toLocaleDateString('es-CL') : '';
+      const hora = d ? d.toLocaleTimeString('es-CL', {hour:'2-digit', minute:'2-digit'}) : '';
+      const impact = ev.impact || 'Low';
+      return `<tr>
+        <td>${fecha}</td><td>${hora}</td><td>${ev.country || ''}</td>
+        <td><span class="impact-dot impact-${impact}"></span>${ev.title || ''}</td>
+        <td>${ev.forecast || '—'}</td><td>${ev.previous || '—'}</td><td>${ev.actual || '—'}</td>
+      </tr>`;
+    }).join('');
+  }catch(e){ console.error('calendar', e); }
+}
+
+// ── Charts ────────────────────────────────────────────────────────────────
+const chartInstances = {};
+async function refreshChart(key){
+  try{
+    const r = await fetch(`/api/launchpad/chart/${key}`);
+    const data = await r.json();
+    const canvas = document.getElementById(`chart-${key}`);
+    if (!canvas) return;
+    const points = data.points || [];
+    const labels = points.map(p => new Date(p.t).toLocaleTimeString('es-CL', {hour:'2-digit', minute:'2-digit'}));
+    const values = points.map(p => p.c);
+    if (chartInstances[key]){
+      chartInstances[key].data.labels = labels;
+      chartInstances[key].data.datasets[0].data = values;
+      chartInstances[key].update('none');
+      return;
+    }
+    chartInstances[key] = new Chart(canvas.getContext('2d'), {
+      type: 'line',
+      data: { labels, datasets: [{ data: values, borderColor: '#ff9d00', borderWidth: 1.3,
+        pointRadius: 0, tension: 0.15, fill: false }] },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: false,
+        plugins: { legend: { display: false }, tooltip: { enabled: true } },
+        scales: {
+          x: { display: true, ticks: { color: '#5f666b', maxTicksLimit: 4, font: {size: 9} }, grid: { color: '#14171a' } },
+          y: { display: true, ticks: { color: '#5f666b', maxTicksLimit: 4, font: {size: 9} }, grid: { color: '#14171a' } },
+        },
+      },
+    });
+  }catch(e){ console.error('chart', key, e); }
+}
+
+function refreshAllCharts(){
+  ['g4','g5','g6','g7'].forEach(refreshChart);
+}
+
+// ── Reloj ─────────────────────────────────────────────────────────────────
+function pad(n){ return n.toString().padStart(2,'0'); }
+function tickClocks(){
+  const now = new Date();
+  const opts = { hour12:false, hour:'2-digit', minute:'2-digit', second:'2-digit' };
+  document.getElementById('clock-scl').textContent = now.toLocaleTimeString('es-CL', {...opts, timeZone:'America/Santiago'});
+  document.getElementById('clock-nyc').textContent = now.toLocaleTimeString('en-US', {...opts, timeZone:'America/New_York'});
+  document.getElementById('clock-lon').textContent = now.toLocaleTimeString('en-GB', {...opts, timeZone:'Europe/London'});
+  document.getElementById('topbar-clock').textContent = now.toLocaleTimeString('es-CL', {...opts, timeZone:'America/Santiago'}) + ' SCL';
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────
+tickClocks();
+setInterval(tickClocks, 1000);
+
+refreshQuotes(); setInterval(refreshQuotes, 15000);
+refreshChile(); setInterval(refreshChile, 5 * 60000);
+refreshNews(); setInterval(refreshNews, 5 * 60000);
+refreshCalendar(); setInterval(refreshCalendar, 30 * 60000);
+refreshAllCharts(); setInterval(refreshAllCharts, 60000);
+</script>
+</body>
+</html>
