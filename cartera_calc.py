@@ -1,6 +1,6 @@
 """
 Lógica de cálculo de cartera — generado automáticamente desde cartola BCI.
-Posiciones base: cartola 11/09/2026.
+Posiciones base: cartola 25/09/2026.
 NO editar manualmente — se sobreescribe con cada sync.
 """
 from datetime import date
@@ -8,16 +8,16 @@ from datetime import date
 # ── EL LTDA (76.677.950-6) ─────────────────────────────────────────────────────
 # (nemotécnico, nombre, cant_activo, cant_pasivo, precio_cartola)
 EL_ACCIONES = [
-    ("ABC", "Abc S.A.", 23_210_430, 0, 9.95),
-    ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 333.5),
-    ("CENCOMALLS", "Cencosud Shopping S.A.", 201_126, 0, 2450.0),
-    ("CENCOSUD", "Cencosud S.A.", 136_229, 0, 2011.1),
-    ("CMPC", "Empresas Cmpc S.A.", 150_000, 0, 1002.2),
+    ("ABC", "Abc S.A.", 23_210_430, 0, 10.5),
+    ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 329.99),
+    ("CENCOMALLS", "Cencosud Shopping S.A.", 81_126, 0, 2288.0),
+    ("CENCOSUD", "Cencosud S.A.", 136_229, 0, 2000.0),
+    ("CMPC", "Empresas Cmpc S.A.", 150_000, 0, 990.0),
 ]
 
 # (nemotécnico, nombre, cantidad, precio_compra, precio_cartola)
 EL_CFI = [
-    ("CFIARRAA-E", "Cfiarraa-E", 4_132, 48151.1358, 55870.0),
+    ("CFIARRAA-E", "Cfiarraa-E", 4_132, 48151.1358, 56172.0416),
     ("CFITRIPT-E", "Cfitript-E", 1_471, 13280.7614, 14000.0),
 ]
 
@@ -27,33 +27,39 @@ EL_SIM = [
 
 # ── EMF SPA (77.209.686-0) ──────────────────────────────────────────────────────
 EMF_CFI = [
-    ("CFIARRAA-E", "Cfiarraa-E", 500, 47154.0, 55870.0),
+    ("CFIARRAA-E", "Cfiarraa-E", 500, 47154.0, 56172.0416),
 ]
 
 # (folio, tipo C/V, usd, tc_fwd, f_inicio, f_termino)
 EMF_FWD = [
-    (1861589, "C", 500_000, 939.0, date(2026,9,10), date(2026,9,15)),
-    (1861590, "V", 500_000, 939.9, date(2026,9,10), date(2026,9,15)),
+    (1863014, "C", 500_000, 956.46, date(2026,9,21), date(2026,10,1)),
+    (1863056, "C", 500_000, 949.25, date(2026,9,21), date(2026,10,1)),
+    (1863063, "C", 500_000, 947.85, date(2026,9,21), date(2026,10,1)),
+    (1863732, "V", 500_000, 966.11, date(2026,9,24), date(2026,10,9)),
+    (1863733, "V", 500_000, 966.2, date(2026,9,24), date(2026,10,9)),
+    (1863734, "V", 500_000, 966.3, date(2026,9,24), date(2026,10,9)),
     (1861591, "V", 500_000, 939.7, date(2026,9,10), date(2026,10,1)),
+    (1862605, "V", 500_000, 957.1, date(2026,9,16), date(2026,10,1)),
+    (1862606, "V", 500_000, 957.1, date(2026,9,16), date(2026,10,1)),
 ]
 
-# Cajas (saldo cartola 11/09/2026)
-CAJA_EL       = 0
+# Cajas (saldo cartola 25/09/2026)
+CAJA_EL       = 1_000_000_060
 OPS_LIQUIDAR  = 0
-CAJA_EMF      = 65_386_120
+CAJA_EMF      = 65_836_120
 
-# Precios base (cartola 11/09/2026)
+# Precios base (cartola 25/09/2026)
 PRECIOS_DEFAULT = {
-    "UF": 40901.94,
-    "USD": 937.17,
-    "EUR": 1088.97,
-    "ABC": 9.95,
-    "AGUAS-A": 333.5,
-    "CENCOMALLS": 2450.0,
-    "CENCOSUD": 2011.1,
-    "CFIARRAA-E": 55870.0,
+    "UF": 41016.28,
+    "USD": 965.71,
+    "EUR": 1098.15,
+    "ABC": 10.5,
+    "AGUAS-A": 329.99,
+    "CENCOMALLS": 2288.0,
+    "CENCOSUD": 2000.0,
+    "CFIARRAA-E": 56172.0416,
     "CFITRIPT-E": 14000.0,
-    "CMPC": 1002.2,
+    "CMPC": 990.0,
 }
 
 INSTRUMENTOS_META = {
