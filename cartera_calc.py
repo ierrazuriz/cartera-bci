@@ -1,6 +1,6 @@
 """
 Lógica de cálculo de cartera — generado automáticamente desde cartola BCI.
-Posiciones base: cartola 25/09/2026.
+Posiciones base: cartola 01/10/2026.
 NO editar manualmente — se sobreescribe con cada sync.
 """
 from datetime import date
@@ -8,16 +8,20 @@ from datetime import date
 # ── EL LTDA (76.677.950-6) ─────────────────────────────────────────────────────
 # (nemotécnico, nombre, cant_activo, cant_pasivo, precio_cartola)
 EL_ACCIONES = [
-    ("ABC", "Abc S.A.", 23_210_430, 0, 10.5),
-    ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 329.99),
-    ("CENCOMALLS", "Cencosud Shopping S.A.", 81_126, 0, 2288.0),
-    ("CENCOSUD", "Cencosud S.A.", 136_229, 0, 2000.0),
-    ("CMPC", "Empresas Cmpc S.A.", 150_000, 0, 990.0),
+    ("ABC", "Abc S.A.", 23_210_430, 0, 9.6),
+    ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 321.5),
+    ("CENCOMALLS", "Cencosud Shopping S.A.", 201_126, 0, 2175.0),
+    ("CENCOSUD", "Cencosud S.A.", 136_229, 0, 1905.0),
+    ("CHILE", "Banco De Chile", 3_000_000, 0, 194.5),
+    ("CMPC", "Empresas Cmpc S.A.", 150_000, 0, 975.0),
+    ("COPEC", "Empresas Copec S.A.", 50_136, 0, 6300.0),
+    ("FALABELLA", "Falabella S.A.", 20_713, 0, 6224.0),
+    ("LTM", "Latam Airlines Group S.A.", 13_386_728, 0, 24.33),
 ]
 
 # (nemotécnico, nombre, cantidad, precio_compra, precio_cartola)
 EL_CFI = [
-    ("CFIARRAA-E", "Cfiarraa-E", 4_132, 48151.1358, 56172.0416),
+    ("CFIARRAA-E", "Cfiarraa-E", 4_132, 48151.1358, 55519.0),
     ("CFITRIPT-E", "Cfitript-E", 1_471, 13280.7614, 14000.0),
 ]
 
@@ -27,39 +31,38 @@ EL_SIM = [
 
 # ── EMF SPA (77.209.686-0) ──────────────────────────────────────────────────────
 EMF_CFI = [
-    ("CFIARRAA-E", "Cfiarraa-E", 500, 47154.0, 56172.0416),
+    ("CFIARRAA-E", "Cfiarraa-E", 500, 47154.0, 55519.0),
 ]
 
 # (folio, tipo C/V, usd, tc_fwd, f_inicio, f_termino)
 EMF_FWD = [
-    (1863014, "C", 500_000, 956.46, date(2026,9,21), date(2026,10,1)),
-    (1863056, "C", 500_000, 949.25, date(2026,9,21), date(2026,10,1)),
-    (1863063, "C", 500_000, 947.85, date(2026,9,21), date(2026,10,1)),
     (1863732, "V", 500_000, 966.11, date(2026,9,24), date(2026,10,9)),
     (1863733, "V", 500_000, 966.2, date(2026,9,24), date(2026,10,9)),
     (1863734, "V", 500_000, 966.3, date(2026,9,24), date(2026,10,9)),
-    (1861591, "V", 500_000, 939.7, date(2026,9,10), date(2026,10,1)),
-    (1862605, "V", 500_000, 957.1, date(2026,9,16), date(2026,10,1)),
-    (1862606, "V", 500_000, 957.1, date(2026,9,16), date(2026,10,1)),
+    (1863987, "V", 500_000, 967.65, date(2026,9,25), date(2026,10,9)),
 ]
 
-# Cajas (saldo cartola 25/09/2026)
-CAJA_EL       = 1_000_000_060
-OPS_LIQUIDAR  = 0
-CAJA_EMF      = 65_836_120
+# Cajas (saldo cartola 01/10/2026)
+CAJA_EL       = -484_087_325
+OPS_LIQUIDAR  = 245_916_247
+CAJA_EMF      = 73_416_120
 
-# Precios base (cartola 25/09/2026)
+# Precios base (cartola 01/10/2026)
 PRECIOS_DEFAULT = {
-    "UF": 41016.28,
-    "USD": 965.71,
-    "EUR": 1098.15,
-    "ABC": 10.5,
-    "AGUAS-A": 329.99,
-    "CENCOMALLS": 2288.0,
-    "CENCOSUD": 2000.0,
-    "CFIARRAA-E": 56172.0416,
+    "UF": 41065.38,
+    "USD": 972.6,
+    "EUR": 1102.72,
+    "ABC": 9.6,
+    "AGUAS-A": 321.5,
+    "CENCOMALLS": 2175.0,
+    "CENCOSUD": 1905.0,
+    "CFIARRAA-E": 55519.0,
     "CFITRIPT-E": 14000.0,
-    "CMPC": 990.0,
+    "CHILE": 194.5,
+    "CMPC": 975.0,
+    "COPEC": 6300.0,
+    "FALABELLA": 6224.0,
+    "LTM": 24.33,
 }
 
 INSTRUMENTOS_META = {
@@ -67,7 +70,11 @@ INSTRUMENTOS_META = {
     "AGUAS-A": {"nombre": "Aguas Andinas S.A.", "tipo": "accion", "fmt": ".4f"},
     "CENCOMALLS": {"nombre": "Cencosud Shopping S.A.", "tipo": "accion", "fmt": ".4f"},
     "CENCOSUD": {"nombre": "Cencosud S.A.", "tipo": "accion", "fmt": ".4f"},
+    "CHILE": {"nombre": "Banco De Chile", "tipo": "accion", "fmt": ".4f"},
     "CMPC": {"nombre": "Empresas Cmpc S.A.", "tipo": "accion", "fmt": ".4f"},
+    "COPEC": {"nombre": "Empresas Copec S.A.", "tipo": "accion", "fmt": ".4f"},
+    "FALABELLA": {"nombre": "Falabella S.A.", "tipo": "accion", "fmt": ".4f"},
+    "LTM": {"nombre": "Latam Airlines Group S.A.", "tipo": "accion", "fmt": ".4f"},
     "CFIARRAA-E": {"nombre": "Cfiarraa-E", "tipo": "cfi", "fmt": ".4f"},
     "CFITRIPT-E": {"nombre": "Cfitript-E", "tipo": "cfi", "fmt": ".4f"},
 }
