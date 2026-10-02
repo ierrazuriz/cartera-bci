@@ -1,6 +1,6 @@
 """
 Lógica de cálculo de cartera — generado automáticamente desde cartola BCI.
-Posiciones base: cartola 01/10/2026.
+Posiciones base: cartola 02/10/2026.
 NO editar manualmente — se sobreescribe con cada sync.
 """
 from datetime import date
@@ -9,29 +9,30 @@ from datetime import date
 # (nemotécnico, nombre, cant_activo, cant_pasivo, precio_cartola)
 EL_ACCIONES = [
     ("ABC", "Abc S.A.", 23_210_430, 0, 9.6),
-    ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 321.5),
-    ("CENCOMALLS", "Cencosud Shopping S.A.", 201_126, 0, 2175.0),
-    ("CENCOSUD", "Cencosud S.A.", 136_229, 0, 1905.0),
-    ("CHILE", "Banco De Chile", 3_000_000, 0, 194.5),
-    ("CMPC", "Empresas Cmpc S.A.", 150_000, 0, 975.0),
-    ("COPEC", "Empresas Copec S.A.", 50_136, 0, 6300.0),
-    ("FALABELLA", "Falabella S.A.", 20_713, 0, 6224.0),
-    ("LTM", "Latam Airlines Group S.A.", 13_386_728, 0, 24.33),
+    ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 318.0),
+    ("CENCOMALLS", "Cencosud Shopping S.A.", 201_126, 0, 2176.0),
+    ("CENCOSUD", "Cencosud S.A.", 336_229, 0, 1890.0),
+    ("CHILE", "Banco De Chile", 7_009_086, 0, 191.0),
+    ("CMPC", "Empresas Cmpc S.A.", 150_000, 0, 975.52),
+    ("COPEC", "Empresas Copec S.A.", 15_136, 0, 6300.0),
+    ("FALABELLA", "Falabella S.A.", 20_713, 0, 6370.0),
+    ("LTM", "Latam Airlines Group S.A.", 23_386_728, 0, 23.54),
 ]
 
 # (nemotécnico, nombre, cantidad, precio_compra, precio_cartola)
 EL_CFI = [
-    ("CFIARRAA-E", "Cfiarraa-E", 4_132, 48151.1358, 55519.0),
+    ("CFIARRAA-E", "Cfiarraa-E", 4_132, 48151.1358, 54284.8199),
     ("CFITRIPT-E", "Cfitript-E", 1_471, 13280.7614, 14000.0),
 ]
 
 # (instrumento, cantidad, f_venta, monto_venta, f_compra, monto_compra)
 EL_SIM = [
+    ("CHILE", 2_519_058, date(2026,10,1), 484_087_376, date(2026,10,30), 486_333_620),
 ]
 
 # ── EMF SPA (77.209.686-0) ──────────────────────────────────────────────────────
 EMF_CFI = [
-    ("CFIARRAA-E", "Cfiarraa-E", 500, 47154.0, 55519.0),
+    ("CFIARRAA-E", "Cfiarraa-E", 500, 47154.0, 54284.8199),
 ]
 
 # (folio, tipo C/V, usd, tc_fwd, f_inicio, f_termino)
@@ -40,29 +41,30 @@ EMF_FWD = [
     (1863733, "V", 500_000, 966.2, date(2026,9,24), date(2026,10,9)),
     (1863734, "V", 500_000, 966.3, date(2026,9,24), date(2026,10,9)),
     (1863987, "V", 500_000, 967.65, date(2026,9,25), date(2026,10,9)),
+    (1864973, "V", 250_000, 982.44, date(2026,10,1), date(2026,10,27)),
 ]
 
-# Cajas (saldo cartola 01/10/2026)
-CAJA_EL       = -484_087_325
-OPS_LIQUIDAR  = 245_916_247
-CAJA_EMF      = 73_416_120
+# Cajas (saldo cartola 02/10/2026)
+CAJA_EL       = 245_916_298
+OPS_LIQUIDAR  = -1_162_688_312
+CAJA_EMF      = 73_586_120
 
-# Precios base (cartola 01/10/2026)
+# Precios base (cartola 02/10/2026)
 PRECIOS_DEFAULT = {
-    "UF": 41065.38,
-    "USD": 972.6,
-    "EUR": 1102.72,
+    "UF": 41073.57,
+    "USD": 983.84,
+    "EUR": 1104.57,
     "ABC": 9.6,
-    "AGUAS-A": 321.5,
-    "CENCOMALLS": 2175.0,
-    "CENCOSUD": 1905.0,
-    "CFIARRAA-E": 55519.0,
+    "AGUAS-A": 318.0,
+    "CENCOMALLS": 2176.0,
+    "CENCOSUD": 1890.0,
+    "CFIARRAA-E": 54284.8199,
     "CFITRIPT-E": 14000.0,
-    "CHILE": 194.5,
-    "CMPC": 975.0,
+    "CHILE": 191.0,
+    "CMPC": 975.52,
     "COPEC": 6300.0,
-    "FALABELLA": 6224.0,
-    "LTM": 24.33,
+    "FALABELLA": 6370.0,
+    "LTM": 23.54,
 }
 
 INSTRUMENTOS_META = {
