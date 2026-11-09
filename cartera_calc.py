@@ -1,6 +1,6 @@
 """
 Lógica de cálculo de cartera — generado automáticamente desde cartola BCI.
-Posiciones base: cartola 06/11/2026.
+Posiciones base: cartola 09/11/2026.
 NO editar manualmente — se sobreescribe con cada sync.
 """
 from datetime import date
@@ -8,19 +8,19 @@ from datetime import date
 # ── EL LTDA (76.677.950-6) ─────────────────────────────────────────────────────
 # (nemotécnico, nombre, cant_activo, cant_pasivo, precio_cartola)
 EL_ACCIONES = [
-    ("ABC", "Abc S.A.", 23_210_430, 0, 7.997),
-    ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 322.0),
-    ("CENCOMALLS", "Cencosud Shopping S.A.", 201_126, 0, 2125.0),
-    ("CENCOSUD", "Cencosud S.A.", 336_229, 0, 1619.9),
-    ("CHILE", "Banco De Chile", 7_009_086, 0, 189.69),
-    ("CMPC", "Empresas Cmpc S.A.", 150_000, 0, 905.0),
-    ("COPEC", "Empresas Copec S.A.", 15_136, 0, 6340.0),
-    ("SOCOVESA", "Socovesa S.A.", 10_734, 0, 155.0),
+    ("ABC", "Abc S.A.", 23_210_430, 0, 8.354),
+    ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 326.2),
+    ("CENCOMALLS", "Cencosud Shopping S.A.", 201_126, 0, 2180.0),
+    ("CENCOSUD", "Cencosud S.A.", 336_229, 0, 1670.0),
+    ("CHILE", "Banco De Chile", 7_009_086, 0, 189.1),
+    ("CMPC", "Empresas Cmpc S.A.", 150_000, 0, 898.0),
+    ("COPEC", "Empresas Copec S.A.", 15_136, 0, 6375.0),
+    ("SOCOVESA", "Socovesa S.A.", 10_734, 0, 157.0),
 ]
 
 # (nemotécnico, nombre, cantidad, precio_compra, precio_cartola)
 EL_CFI = [
-    ("CFIARRAA-E", "Cfiarraa-E", 4_132, 48151.1358, 51721.57),
+    ("CFIARRAA-E", "Cfiarraa-E", 4_132, 48151.1358, 52432.52),
     ("CFITRIPT-E", "Cfitript-E", 1_471, 13280.7614, 14000.0),
 ]
 
@@ -44,26 +44,26 @@ EMF_FWD = [
     (1870794, "V", 500_000, 967.67, date(2026,11,5), date(2026,11,25)),
 ]
 
-# Cajas (saldo cartola 06/11/2026)
+# Cajas (saldo cartola 09/11/2026)
 CAJA_EL       = 91
 OPS_LIQUIDAR  = 0
-CAJA_EMF      = 98_843_444
+CAJA_EMF      = 124_458_444
 
-# Precios base (cartola 06/11/2026)
+# Precios base (cartola 09/11/2026)
 PRECIOS_DEFAULT = {
-    "UF": 41279.51,
-    "USD": 970.94,
-    "EUR": 1090.94,
-    "ABC": 7.997,
-    "AGUAS-A": 322.0,
-    "CENCOMALLS": 2125.0,
-    "CENCOSUD": 1619.9,
-    "CFIARRAA-E": 51721.57,
+    "UF": 41295.46,
+    "USD": 979.88,
+    "EUR": 1092.4,
+    "ABC": 8.354,
+    "AGUAS-A": 326.2,
+    "CENCOMALLS": 2180.0,
+    "CENCOSUD": 1670.0,
+    "CFIARRAA-E": 52432.52,
     "CFITRIPT-E": 14000.0,
-    "CHILE": 189.69,
-    "CMPC": 905.0,
-    "COPEC": 6340.0,
-    "SOCOVESA": 155.0,
+    "CHILE": 189.1,
+    "CMPC": 898.0,
+    "COPEC": 6375.0,
+    "SOCOVESA": 157.0,
 }
 
 INSTRUMENTOS_META = {
