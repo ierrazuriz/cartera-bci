@@ -1,6 +1,6 @@
 """
 Lógica de cálculo de cartera — generado automáticamente desde cartola BCI.
-Posiciones base: cartola 18/11/2026.
+Posiciones base: cartola 19/11/2026.
 NO editar manualmente — se sobreescribe con cada sync.
 """
 from datetime import date
@@ -8,13 +8,13 @@ from datetime import date
 # ── EL LTDA (76.677.950-6) ─────────────────────────────────────────────────────
 # (nemotécnico, nombre, cant_activo, cant_pasivo, precio_cartola)
 EL_ACCIONES = [
-    ("ABC", "Abc S.A.", 23_210_430, 0, 8.156),
+    ("ABC", "Abc S.A.", 23_210_430, 0, 7.95),
     ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 324.9),
-    ("CENCOMALLS", "Cencosud Shopping S.A.", 201_126, 0, 2140.0),
-    ("CENCOSUD", "Cencosud S.A.", 336_229, 0, 1745.0),
-    ("CHILE", "Banco De Chile", 7_009_086, 0, 190.85),
-    ("CMPC", "Empresas Cmpc S.A.", 150_000, 0, 910.0),
-    ("COPEC", "Empresas Copec S.A.", 15_136, 0, 6215.0),
+    ("CENCOMALLS", "Cencosud Shopping S.A.", 201_126, 0, 2085.0),
+    ("CENCOSUD", "Cencosud S.A.", 336_229, 0, 1692.0),
+    ("CHILE", "Banco De Chile", 7_009_086, 0, 189.5),
+    ("CMPC", "Empresas Cmpc S.A.", 150_000, 0, 910.07),
+    ("COPEC", "Empresas Copec S.A.", 15_136, 0, 6395.0),
     ("SOCOVESA", "Socovesa S.A.", 10_734, 0, 153.48),
 ]
 
@@ -51,25 +51,25 @@ EMF_FWD = [
     (1871480, "V", 500_000, 982.42, date(2026,11,10), date(2026,12,11)),
 ]
 
-# Cajas (saldo cartola 18/11/2026)
-CAJA_EL       = 453
-OPS_LIQUIDAR  = 8_045_040
+# Cajas (saldo cartola 19/11/2026)
+CAJA_EL       = 8_045_493
+OPS_LIQUIDAR  = 0
 CAJA_EMF      = 125_558_444
 
-# Precios base (cartola 18/11/2026)
+# Precios base (cartola 19/11/2026)
 PRECIOS_DEFAULT = {
-    "UF": 41357.3,
-    "USD": 996.68,
-    "EUR": 1098.03,
-    "ABC": 8.156,
+    "UF": 41364.17,
+    "USD": 1002.07,
+    "EUR": 1099.6,
+    "ABC": 7.95,
     "AGUAS-A": 324.9,
-    "CENCOMALLS": 2140.0,
-    "CENCOSUD": 1745.0,
+    "CENCOMALLS": 2085.0,
+    "CENCOSUD": 1692.0,
     "CFIARRAA-E": 52569.736,
     "CFITRIPT-E": 14000.0,
-    "CHILE": 190.85,
-    "CMPC": 910.0,
-    "COPEC": 6215.0,
+    "CHILE": 189.5,
+    "CMPC": 910.07,
+    "COPEC": 6395.0,
     "SOCOVESA": 153.48,
 }
 
