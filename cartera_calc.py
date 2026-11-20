@@ -1,6 +1,6 @@
 """
 Lógica de cálculo de cartera — generado automáticamente desde cartola BCI.
-Posiciones base: cartola 19/11/2026.
+Posiciones base: cartola 20/11/2026.
 NO editar manualmente — se sobreescribe con cada sync.
 """
 from datetime import date
@@ -9,18 +9,18 @@ from datetime import date
 # (nemotécnico, nombre, cant_activo, cant_pasivo, precio_cartola)
 EL_ACCIONES = [
     ("ABC", "Abc S.A.", 23_210_430, 0, 7.95),
-    ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 324.9),
-    ("CENCOMALLS", "Cencosud Shopping S.A.", 201_126, 0, 2085.0),
-    ("CENCOSUD", "Cencosud S.A.", 336_229, 0, 1692.0),
-    ("CHILE", "Banco De Chile", 7_009_086, 0, 189.5),
-    ("CMPC", "Empresas Cmpc S.A.", 150_000, 0, 910.07),
-    ("COPEC", "Empresas Copec S.A.", 15_136, 0, 6395.0),
-    ("SOCOVESA", "Socovesa S.A.", 10_734, 0, 153.48),
+    ("AGUAS-A", "Aguas Andinas S.A.", 1_819_069, 0, 322.5),
+    ("CENCOMALLS", "Cencosud Shopping S.A.", 201_126, 0, 2080.0),
+    ("CENCOSUD", "Cencosud S.A.", 336_229, 0, 1700.0),
+    ("CHILE", "Banco De Chile", 7_009_086, 0, 189.2),
+    ("CMPC", "Empresas Cmpc S.A.", 150_000, 0, 937.9),
+    ("COPEC", "Empresas Copec S.A.", 15_136, 0, 6315.0),
+    ("SOCOVESA", "Socovesa S.A.", 10_734, 0, 152.5),
 ]
 
 # (nemotécnico, nombre, cantidad, precio_compra, precio_cartola)
 EL_CFI = [
-    ("CFIARRAA-E", "Cfiarraa-E", 4_132, 48151.1358, 52569.736),
+    ("CFIARRAA-E", "Cfiarraa-E", 4_132, 48151.1358, 51964.0),
     ("CFITRIPT-E", "Cfitript-E", 1_471, 13280.7614, 14000.0),
 ]
 
@@ -39,6 +39,9 @@ EMF_CFI = [
 
 # (folio, tipo C/V, usd, tc_fwd, f_inicio, f_termino)
 EMF_FWD = [
+    (1873149, "C", 500_000, 1007.1, date(2026,11,19), date(2026,11,24)),
+    (1873150, "C", 500_000, 1006.0, date(2026,11,19), date(2026,11,24)),
+    (1873151, "C", 500_000, 1006.3, date(2026,11,19), date(2026,11,24)),
     (1870439, "C", 500_000, 971.29, date(2026,11,4), date(2026,11,25)),
     (1870440, "C", 500_000, 971.19, date(2026,11,4), date(2026,11,25)),
     (1872189, "C", 500_000, 1000.1, date(2026,11,13), date(2026,12,11)),
@@ -49,28 +52,31 @@ EMF_FWD = [
     (1871476, "V", 500_000, 974.12, date(2026,11,10), date(2026,12,11)),
     (1871478, "V", 500_000, 978.92, date(2026,11,10), date(2026,12,11)),
     (1871480, "V", 500_000, 982.42, date(2026,11,10), date(2026,12,11)),
+    (1873152, "V", 500_000, 1007.9, date(2026,11,19), date(2026,11,24)),
+    (1873153, "V", 500_000, 1007.9, date(2026,11,19), date(2026,11,24)),
+    (1873154, "V", 500_000, 1007.2, date(2026,11,19), date(2026,11,24)),
 ]
 
-# Cajas (saldo cartola 19/11/2026)
+# Cajas (saldo cartola 20/11/2026)
 CAJA_EL       = 8_045_493
 OPS_LIQUIDAR  = 0
 CAJA_EMF      = 125_558_444
 
-# Precios base (cartola 19/11/2026)
+# Precios base (cartola 20/11/2026)
 PRECIOS_DEFAULT = {
-    "UF": 41364.17,
-    "USD": 1002.07,
-    "EUR": 1099.6,
+    "UF": 41371.05,
+    "USD": 1008.79,
+    "EUR": 1107.59,
     "ABC": 7.95,
-    "AGUAS-A": 324.9,
-    "CENCOMALLS": 2085.0,
-    "CENCOSUD": 1692.0,
-    "CFIARRAA-E": 52569.736,
+    "AGUAS-A": 322.5,
+    "CENCOMALLS": 2080.0,
+    "CENCOSUD": 1700.0,
+    "CFIARRAA-E": 51964.0,
     "CFITRIPT-E": 14000.0,
-    "CHILE": 189.5,
-    "CMPC": 910.07,
-    "COPEC": 6395.0,
-    "SOCOVESA": 153.48,
+    "CHILE": 189.2,
+    "CMPC": 937.9,
+    "COPEC": 6315.0,
+    "SOCOVESA": 152.5,
 }
 
 INSTRUMENTOS_META = {
